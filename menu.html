@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<!--
+  * Please see the included README.md file for license terms and conditions.
+  -->
+
+<head>
+    <title>QuàsarApp</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+    <!-- see http://webdesign.tutsplus.com/tutorials/htmlcss-tutorials/quick-tip-dont-forget-the-viewport-meta-tag -->
+    <!-- <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1"> -->
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=no">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, minimum-scale=1, maximum-scale=2"> -->
+    <style>
+        /* following two viewport lines are equivalent to meta viewport statement above, and is needed for Windows */
+        /* see http://www.quirksmode.org/blog/archives/2014/05/html5_dev_conf.html and http://dev.w3.org/csswg/css-device-adapt/ */
+        
+        @-ms-viewport {
+            width: 100vw;
+            min-zoom: 100%;
+            zoom: 100%;
+        }
+        
+        @viewport {
+            width: 100vw;
+            min-zoom: 100% zoom: 100%;
+        }
+        
+        @-ms-viewport {
+            user-zoom: fixed;
+            min-zoom: 100%;
+        }
+        
+        @viewport {
+            user-zoom: fixed;
+            min-zoom: 100%;
+        }
+        /*@-ms-viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }   @viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }*/
+    </style>
+
+    <!-- See explanation at the bottom of this file for info regarding placement of JS libraries. -->
+    <!-- These library references (below) are just examples to give you the general idea... -->
+    <!-- <script src="lib/mc/hammer.js"></script> -->
+    <!-- <script src="lib/ft/fastclick.js"></script> -->
+    <!-- <script src="lib/jq/jquery.js"></script> -->
+
+    <link rel="stylesheet" href="css/app.css">
+<script type="text/javascript">
+    
+    
+            var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+            var dataBase = null;
+
+          function startDB() {
+ 
+                dataBase = indexedDB.open("objectDb4", 1);
+
+                dataBase.onupgradeneeded = function (e) {
+
+                    var active = dataBase.result;
+                    var objectDb = active.createObjectStore("pacientes", {keyPath: 'id', autoIncrement: true});
+                    objectDb.createIndex('by_dni', 'dni', {unique: true});
+
+                    var objectDb1 = active.createObjectStore("pruebas", {
+                    keyPath: 'id',
+                    autoIncrement: true
+                   });              
+                }
+
+                dataBase.onsuccess = function (e) {
+                    //alert('Database loaded');
+                    loadAll();
+                };
+
+                dataBase.onerror = function (e) {
+                    alert('Error loading database');
+                };
+
+            }
+    
+        function passdata(){ 
+            myForm=document.f1 
+            //for(i=0;i<myForm.length-1;i++){ // run through form elements 
+            myString=add_delimiters("dni1",document.querySelector("#dni1").value) 
+            location.href = 'addprueba.html' + '?' + encodeURI(myString) 
+
+            function add_delimiters(n,v){ 
+                if(n!=""){ // add = and & characters to identify name and value pairs 
+                    return n+"="+v+"&"
+                } 
+            }
+        }
+         
+         function getData(){ 
+           if (location.search.length > 0){ 
+           dataPassed = decodeURI(location.search.substring(1)) 
+           tempArray1=dataPassed.split("&") // split the string at character & and create an array of values  
+       for(i=0;i<tempArray1.length-1;i++){ // get value at array index i (name=value) 
+       tempArray2=tempArray1[i].split("=") // split the string at character = 
+       document.f1.elements["dni1"].value=tempArray2[1] // assign the value 
+              } 
+            } 
+         }
+    
+     function load(id) {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");
+                var objectDb = data.objectStore("pacientes");
+
+                var request = objectDb.get(parseInt(id));
+
+                request.onsuccess = function () {
+                    var result = request.result;
+
+                    if (result !== undefined) {
+                        alert("ID: " + result.id + "\n\
+                               DNI " + result.dni + "\n\
+                               Tipo: " + result.tipo);
+                    }
+                };
+            }
+        
+        function loadbydniref(dni)
+              {
+                
+                loadByDni(dni.value);
+                
+            }
+
+            function loadByDni(dni) {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");
+                var objectDb = data.objectStore("pacientes");
+                var index = objectDb.index("by_dni");
+                var request = index.get(String(dni));
+
+                request.onsuccess = function () {
+                    var result = request.result;
+
+                    if (result !== undefined) {
+                        alert("ID: " + result.id + "\n\
+                               DNI " + result.dni + "\n\
+                               Tipo: " + result.tipo);
+                    }
+                };
+            }
+
+            function loadAll() {//en esta se muestra todo
+                var active = dataBase.result;
+                var data = active.transaction(["pruebas"], "readonly");
+                var objectDb = data.objectStore("pruebas");//sobre que almacen queremos trabajar
+
+                var elements = [];//array donde guardamos los objetos del almacen
+
+                objectDb.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
+
+                    var result = e.target.result; //el resultado de abrir el curso esta en result
+
+                    if (result === null) {//es cuando llegamos al final
+                        return;
+                    }
+
+                    elements.push(result.value);//vamos guardando en el array
+                    result.continue();//para continuar con el siguiente objeto
+
+                };
+
+                data.oncomplete = function () { //cuando se haya completado todo 
+
+                    var outerHTML = '';//creamos una variable para mostrar el código html
+
+                    for (var key in elements) {//recorremos el array elements 
+
+                        outerHTML += '\n\
+                        <tr>\n\
+                            <td>' + elements[key].id + '</td>\n\
+                            <td>' + elements[key].md + '</td>\n\
+                            <td>' + elements[key].slv + '</td>\n\
+                            <td>' + elements[key].mes + '</td>\n\
+                            <td>' + elements[key].anyo + '</td>\n\
+                            <td>\n\
+                        </tr>';
+                    }
+
+                    elements = [];//vaciamos elements
+                    document.querySelector("#elementsList").innerHTML = outerHTML;
+                };
+            }
+            
+            function loadAllByName() {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");//lanzar transacción
+                var objectDb = data.objectStore("pacientes");//
+                var index = objectDb.index("by_dni");
+                
+                var elements = [];
+
+                index.openCursor().onsuccess = function (e) {
+
+                    var result = e.target.result;
+
+                    if (result === null) {
+                        return;
+                    }
+
+                    elements.push(result.value);
+                    result.continue();
+
+                };
+
+                data.oncomplete = function () {
+
+                    var outerHTML = '';
+
+                    for (var key in elements) {
+
+                        outerHTML += '\n\
+                        <tr>\n\
+                            <td>' + elements[key].dni + '</td>\n\
+                            <td>' + elements[key].tipo + '</td>\n\
+                            <td>\n\
+                                <button type="button" onclick="load(' + elements[key].id + ')">Details</button>\n\
+                                <button type="button" onclick="loadByDni(' + elements[key].dni + ')">Details DNI</button>\n\
+                            </td>\n\
+                        </tr>';
+
+                    }
+
+                    elements = [];
+                    document.querySelector("#elementsList").innerHTML = outerHTML;
+                };
+            }
+
+    </script>
+</head>
+
+
+<body onload="startDB(); getData();">
+
+    <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
+    <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work below -->
+    <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
+
+    <!-- See <head> section above for additional JS libraries loaded as part of this application. -->
+
+    <script src="cordova.js"></script>
+    <!-- "Phantom" cordova.js required for projects that use plugins -->
+
+    <script src="js/app.js"></script>
+    <!-- for your event code, see README and file comments for details -->
+    <script src="js/init-app.js"></script>
+    <!-- for your init code, see README and file comments for details -->
+    <script src="xdk/init-dev.js"></script>
+    <!-- normalizes device and document ready events, see file for details -->
+    <script src="js/util.js"></script>
+
+    <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
+    <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work above -->
+    <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
+    <h1>Menú principal</h1>
+    <div class="align-center">
+    <form name="f1"> 
+    NºHistoria <input type="text" name="dni1" id="dni1" size="5" readonly>
+    </form>
+   <div class="align-center">
+        <hr>
+        <div id="elements">
+            <table>
+                <caption>Pruebas</caption>
+                <thead>
+                    <tr>
+                        <th>Nº</th>
+                        <th>MD</th>
+                        <th>sLv</th>
+                        <th>Mes</th>
+                        <th>Año</th>
+                    </tr>
+                </thead>
+                <tbody id="elementsList">
+                    <tr>
+                        <td colspan="3">Not elements to show</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+        <button type="button" onclick="loadAllByName();">Order por nombre</button>
+        <button onClick="self.location='index.html'">Pagina principal</button>
+    <button onClick="passdata();">Añadir prueba</button>    
+    <button onclick="self.location='buscarpacient.html'">Cargar paciente</button>
+    <button onclick="self.location='mostrarpacients.html'">Mostrar pacientes</button>
+    <button onclick="analisis();">Go</button><!-- con un alert -->
+    <button onclick="self.location='index.html'">Salir</button>
+</div>
+<!--    <button onclick="showInterstitial()">Show Interstitial Ad</button>-->
+</body>

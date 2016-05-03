@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<!--
+  * Please see the included README.md file for license terms and conditions.
+  -->
+
+<head>
+    <title>Blank Cordova Mobile App Template</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+    <!-- see http://webdesign.tutsplus.com/tutorials/htmlcss-tutorials/quick-tip-dont-forget-the-viewport-meta-tag -->
+    <!-- <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1"> -->
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=no">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, minimum-scale=1, maximum-scale=2"> -->
+    <style>
+        /* following two viewport lines are equivalent to meta viewport statement above, and is needed for Windows */
+        /* see http://www.quirksmode.org/blog/archives/2014/05/html5_dev_conf.html and http://dev.w3.org/csswg/css-device-adapt/ */
+        
+        @-ms-viewport {
+            width: 100vw;
+            min-zoom: 100%;
+            zoom: 100%;
+        }
+        
+        @viewport {
+            width: 100vw;
+            min-zoom: 100% zoom: 100%;
+        }
+        
+        @-ms-viewport {
+            user-zoom: fixed;
+            min-zoom: 100%;
+        }
+        
+        @viewport {
+            user-zoom: fixed;
+            min-zoom: 100%;
+        }
+        /*@-ms-viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }   @viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }*/
+    </style>
+
+    <!-- See explanation at the bottom of this file for info regarding placement of JS libraries. -->
+    <!-- These library references (below) are just examples to give you the general idea... -->
+    <!-- <script src="lib/mc/hammer.js"></script> -->
+    <!-- <script src="lib/ft/fastclick.js"></script> -->
+    <!-- <script src="lib/jq/jquery.js"></script> -->
+
+    <link rel="stylesheet" href="css/app.css">
+<script type="text/javascript">
+    
+    
+            var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+            var dataBase = null;
+
+            function startDB() {
+
+                dataBase = indexedDB.open("objectDb4", 1);
+
+                dataBase.onupgradeneeded = function (e) {
+
+                    var active = dataBase.result;
+                    var objectDb = active.createObjectStore("pacientes", {keyPath: 'id', autoIncrement: true});
+                    objectDb.createIndex('by_dni', 'dni', {unique: true});
+                    
+                    var objectDb1 = active.createObjectStore("pruebas", {
+                    keyPath: 'id',
+                    autoIncrement: true
+                   }); 
+                    objectDb1.createIndex('by_dni', 'dni', {unique: false});
+                };
+
+                dataBase.onsuccess = function (e) {
+                    //alert('Database loaded');
+                    //loadAll();
+                };
+
+                dataBase.onerror = function (e) {
+                    alert('Error loading database');
+                };
+
+            }
+            
+            function addpacient() {
+               
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readwrite");
+                var objectDb = data.objectStore("pacientes");
+
+                var request = objectDb.put({
+                    dni: document.querySelector("#dni").value,
+                    tipo: document.querySelector("#tipo").value
+                });
+
+                request.onerror = function (e) {
+                    alert(request.error.name + '\n\n' + request.error.message);
+                };
+
+                data.oncomplete = function (e) {
+
+                    document.querySelector('#dni').value = '';
+                    document.querySelector('#tipo').value = '';
+                    alert('Paciente creado correctamente');
+                    loadAll();
+                };
+
+            }
+    
+       function addprueba() {
+           //
+                //pruebas
+                var active2 = dataBase.result; //conector con la base de datos
+                var data1 = active2.transaction(["pacientes"], "readwrite"); //array ,modo de transacción
+                var objectDb1 = data1.objectStore("pacientes");
+                var index1 = objectDb1.index("by_dni");
+                var request1 = index1.get(document.querySelector("#dni1").value);
+                
+                request1.onsuccess = function () {
+                
+                md1 = document.querySelector("#md").value;
+                slv1 = parseFloat(document.querySelector("#slv").value);
+                var result= request1.result;
+                tipo1 = result.tipo;
+                //alert('hola'+tipo1);
+                if( md1 >16.33 && tipo1 == "O" )//octopus
+                {
+                    //alert('estoy aquí');
+                 slv1 = slv1 + ((md1-16.33)/0.84);
+                    //alert('hola'+slv1);
+                 }else if( md1 <17.35 && tipo1 =="H"){ //humfrey
+                  slv1 = slv1 + ((md1+17.35)/0.84)
+                 }
+                    
+                var active = dataBase.result; //conector con la base de datos
+                var data = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
+                var objectDb = data.objectStore("pruebas");
+                var index = objectDb.index("by_dni");
+                var request = index.get(document.querySelector("#dni1").value);
+           
+                
+                //aquí le pasaría el dni recogido en la otra página y le añadir´
+                var request = objectDb.put({ 
+                md: document.querySelector("#md").value,
+                slv: slv1,
+                mes: document.querySelector("#mes").value,
+                anyo: document.querySelector("#anyo").value,
+                dni: document.querySelector("#dni1").value
+                });
+           request.onerror = function (e) {
+                    alert(request.error.name + '\n\n' + request.error.message);
+                };
+
+                data.oncomplete = function (e) { 
+
+                    document.querySelector('#dni1').value = '';
+                    document.querySelector('#md').value = '';
+                    document.querySelector('#slv').value = '';
+                    document.querySelector('#mes').value = '';
+                    document.querySelector('#anyo').value = '';
+                    alert('Prueba añadida correctamente');
+                };
+                };
+            }
+    
+    function deletedni() {
+
+            var active = dataBase.result;
+            var data = active.transaction(["pacientes"],"readwrite");
+            var object = data.objectStore("pacientes");    
+
+            // primero buscamos el registro a partir del dni
+            var index = object.index("by_dni");
+            var request = index.get(document.querySelector("#dni1").value);
+
+            // cuando se encuentre el registro, lo borramos
+            request.onsuccess = function () {
+            var result = request.result;
+            alert("ID: " + result.id );
+            object.delete(result.id);
+            };
+            
+                request.onerror = function (e) {
+                    alert(request.error.name + '\n\n' + request.error.message);
+                };
+
+                data.oncomplete = function (e) { 
+                    
+                    alert('OK');
+                    loadAll();
+                };
+        }
+    function load(id) {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");
+                var object = data.objectStore("pacientes");
+
+                var request = object.get(parseInt(id));
+
+                request.onsuccess = function () {
+                    var result = request.result;
+
+                    if (result !== undefined) {
+                        alert("ID: " + result.id + "\n\
+                               DNI " + result.dni + "\n\
+                               Name: " + result.name + "\n\
+                               Surname: " + result.surname);
+                    }
+                };
+            }
+        
+        function loadbydniref(dni)
+              {
+                
+                loadByDni(dni.value);
+                
+            }
+
+            function loadByDni(dni) {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");
+                var object = data.objectStore("pacientes");
+                var index = object.index("by_dni");
+                var request = index.get(String(dni));
+
+                request.onsuccess = function () {
+                    var result = request.result;
+
+                    if (result !== undefined) {
+                        alert("ID: " + result.id + "\n\
+                               DNI " + result.dni + "\n\
+                               Name: " + result.name + "\n\
+                               Surname: " + result.surname);
+                    }
+                };
+            }
+
+            function loadAll() {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");
+                var object = data.objectStore("pacientes");//sobre que almacen queremos trabajar
+
+                var elements = [];//array donde guardamos los objetos del almacen
+
+                object.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
+
+                    var result = e.target.result; //el resultado de abrir el curso esta en result
+
+                    if (result === null) {//es cuando llegamos al final
+                        return;
+                    }
+
+                    elements.push(result.value);//vamos guardando en el array
+                    result.continue();//para continuar con el siguiente objeto
+
+                };
+
+                data.oncomplete = function () { //cuando se haya completado todo 
+
+                    var outerHTML = '';//creamos una variable para mostrar el código html
+
+                    for (var key in elements) {//recorremos el array elements 
+
+                        outerHTML += '\n\
+                        <tr>\n\
+                            <td>' + elements[key].dni + '</td>\n\
+                            <td>' + elements[key].name + '</td>\n\
+                            <td>\n\
+                                <button type="button" onclick="load(' + elements[key].id + ')">Detalles</button>\n\
+                                <button type="button" onclick="loadByDni(\'' + elements[key].dni + '\')">Detalles dni</button>\n\
+                            </td>\n\
+                        </tr>';
+
+                    }
+
+                    elements = [];//vaciamos elements
+                    document.querySelector("#elementsList").innerHTML = outerHTML;
+                };
+            }
+            
+            function loadAllByName() {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");//lanzar transacción
+                var object = data.objectStore("pacientes");//
+                var index = object.index("by_name");
+                
+                var elements = [];
+
+                index.openCursor().onsuccess = function (e) {
+
+                    var result = e.target.result;
+
+                    if (result === null) {
+                        return;
+                    }
+
+                    elements.push(result.value);
+                    result.continue();
+
+                };
+
+                data.oncomplete = function () {
+
+                    var outerHTML = '';
+
+                    for (var key in elements) {
+
+                        outerHTML += '\n\
+                        <tr>\n\
+                            <td>' + elements[key].dni + '</td>\n\
+                            <td>' + elements[key].name + '</td>\n\
+                            <td>\n\
+                                <button type="button" onclick="load(' + elements[key].id + ')">Details</button>\n\
+                                <button type="button" onclick="loadByDni(' + elements[key].dni + ')">Details DNI</button>\n\
+                            </td>\n\
+                        </tr>';
+
+                    }
+
+                    elements = [];
+                    document.querySelector("#elementsList").innerHTML = outerHTML;
+                };
+            }
+       function getData(){ 
+           if (location.search.length > 0){ 
+           dataPassed = decodeURI(location.search.substring(1)) 
+           tempArray1=dataPassed.split("&") // split the string at character & and create an array of values  
+       for(i=0;i<tempArray1.length-1;i++){ // get value at array index i (name=value) 
+       tempArray2=tempArray1[i].split("=") // split the string at character = 
+       document.f1.elements["dni1"].value=tempArray2[1] // assign the value 
+              } 
+            } 
+         }
+    
+    
+         
+
+    </script>
+</head>
+
+
+<body onload="startDB(); getData();">
+
+    <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
+    <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work below -->
+    <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
+
+    <!-- See <head> section above for additional JS libraries loaded as part of this application. -->
+
+    <script src="cordova.js"></script>
+    <!-- "Phantom" cordova.js required for projects that use plugins -->
+
+    <script src="js/app.js"></script>
+    <!-- for your event code, see README and file comments for details -->
+    <script src="js/init-app.js"></script>
+    <!-- for your init code, see README and file comments for details -->
+    <script src="xdk/init-dev.js"></script>
+    <!-- normalizes device and document ready events, see file for details -->
+    <script src="js/util.js"></script>
+
+    <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
+    <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work above -->
+    <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
+  <h1>Crear prueba</h1>
+    
+    <div class="align-center">
+        <form name="f1"> 
+         NºHistoria <input type="text" id="dni1" placeholder="dni" readonly/>
+        </form>
+        <input type="text" id="md" placeholder="MD"/>
+        <input type="text" id="slv" placeholder="sLv"/>
+        <input type="text" id="mes" placeholder="Mes"/>
+        <input type="text" id="anyo" placeholder="Año"/>
+        
+          
+          <button type="button" onclick="addprueba(dni1);">Guardar</button><hr>
+          <button onClick="self.location='index.html'">Página inicio</button> 
+        
+    </div>
+</body>
+</html>
+          
