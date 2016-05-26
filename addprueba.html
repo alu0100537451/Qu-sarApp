@@ -5,7 +5,7 @@
   -->
 
 <head>
-    <title>Blank Cordova Mobile App Template</title>
+    <title>QuasarApp</title>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
 
     <!-- see http://webdesign.tutsplus.com/tutorials/htmlcss-tutorials/quick-tip-dont-forget-the-viewport-meta-tag -->
@@ -126,7 +126,7 @@
                     //alert('estoy aquí');
                  slv1 = slv1 + ((md1-16.33)/0.84);
                     //alert('hola'+slv1);
-                 }else if( md1 <17.35 && tipo1 =="H"){ //humfrey
+                 }else if( md1 <-17.35 && tipo1 =="H"){ //humfrey
                   slv1 = slv1 + ((md1+17.35)/0.84)
                  }
                     
@@ -156,7 +156,7 @@
                     document.querySelector('#slv').value = '';
                     document.querySelector('#mes').value = '';
                     document.querySelector('#anyo').value = '';
-                    alert('Prueba añadida correctamente');
+                    alert('The medical test has been created correctly');
                 };
                 };
             }
@@ -359,20 +359,25 @@
     <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
     <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work above -->
     <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
-  <h1>Crear prueba</h1>
+  <h1>Add test</h1>
     
     <div class="align-center">
         <form name="f1"> 
-         NºHistoria <input type="text" id="dni1" placeholder="dni" readonly/>
+        Nº History <input type="text" id="dni1" placeholder="dni" readonly/>
         </form>
+        Enter MD
         <input type="text" id="md" placeholder="MD"/>
+        Enter sLv
         <input type="text" id="slv" placeholder="sLv"/>
-        <input type="text" id="mes" placeholder="Mes"/>
-        <input type="text" id="anyo" placeholder="Año"/>
+        Enter Month 
+        <input type="text" id="mes" placeholder="Month"/>
+        Enter Year
+        <input type="text" id="anyo" placeholder="Year"/>
         
           
-          <button type="button" onclick="addprueba(dni1);">Guardar</button><hr>
-          <button onClick="self.location='index.html'">Página inicio</button> 
+          <button type="button" onclick="addprueba(dni1);">Save</button><hr>
+          <button onClick="self.location='menu.html'">Main Menu</button>
+          <button onClick="self.location='index.html'">Home page</button> 
         
     </div>
 </body>

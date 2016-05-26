@@ -5,7 +5,7 @@
   -->
 
 <head>
-    <title>Blank Cordova Mobile App Template</title>
+    <title>QuasarApp</title>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
 
     <!-- see http://webdesign.tutsplus.com/tutorials/htmlcss-tutorials/quick-tip-dont-forget-the-viewport-meta-tag -->
@@ -96,7 +96,7 @@
                 };
 
                 data.oncomplete = function (e) {
-                    alert('Paciente creado correctamente');
+                    alert('The patient has been created successfully');
                     document.querySelector('#dni').value = '';
                     document.querySelector('#tipo').value = '';
                     //loadAll();
@@ -128,22 +128,23 @@
     <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
     <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work above -->
     <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
-    <h1>Crear paciente</h1>
-    <div> 
-    <input type="text" id="dni" placeholder="Introduzca Nº Historia"/>
+    <h1>Create patient</h1>
     <div>
-        <form>
-    <input type="radio" id="tipo" name="gender" value="O" checked>
-    <label for="octopus">Octopus</label>
-    <input type="radio" id="tipo" name="gender" value="H">
-    <label for="humphrey">Humphrey</label><br>
-        </form>
-    </div>    
+    <input type="text" id="dni" placeholder="Enter Nº History"/>
+      <h3>Choose type</h3><hr>
+      <form class="radiobutton">
+       <input type="radio" id="tipo" name="gender" value="O" checked style="
+    width: 20px;
+    margin-left: 1px;
+">Octopus
+       <input type="radio" id="tipo" name="gender" value="H" style=" 
+    width: 20px;
+    margin-left: 1px;">Humphrey
+      </form><hr>
+    
     <!--<input type="text" id="tipo" placeholder="Introduzca tipo"/>--> 
-    <button type="button" onclick="addpacient();">Crear</button><hr>
-    <button onClick="self.location='menu.html'">Menú principal</button><hr> 
-    <button onClick="self.location='index.html'">Página inicio</button> 
-<!--    <button onclick="showInterstitial()">Show Interstitial Ad</button>-->
- </div>
+    <button type="button" onclick="addpacient();">Add</button><br>
+    <button onClick="self.location='index.html'">Home page</button>
+    </div>
 </body>
 </html>
