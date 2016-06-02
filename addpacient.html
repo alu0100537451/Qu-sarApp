@@ -13,8 +13,6 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=no">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, minimum-scale=1, maximum-scale=2"> -->
     <style>
-        /* following two viewport lines are equivalent to meta viewport statement above, and is needed for Windows */
-        /* see http://www.quirksmode.org/blog/archives/2014/05/html5_dev_conf.html and http://dev.w3.org/csswg/css-device-adapt/ */
         
         @-ms-viewport {
             width: 100vw;
@@ -44,9 +42,10 @@
     <!-- <script src="lib/mc/hammer.js"></script> -->
     <!-- <script src="lib/ft/fastclick.js"></script> -->
     <!-- <script src="lib/jq/jquery.js"></script> -->
-
+    <script language="JavaScript" src="js/md55.js"></script>
     <link rel="stylesheet" href="css/app.css">
-<script type="text/javascript">
+    <link rel="stylesheet" href="css/app.css">
+    <script type="text/javascript">
     
     
             var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -87,7 +86,7 @@
                 var objectDb2 = data.objectStore("pacientes");
 
                 var request = objectDb2.put({
-                    dni: document.querySelector("#dni").value,
+                    dni:calcMD5(document.querySelector("#dni").value),//md5(document.querySelector("#dni").value)
                     tipo: document.querySelector("#tipo").value
                 });
 

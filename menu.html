@@ -51,8 +51,12 @@
 <script src="http://code.highcharts.com/stock/highstock.js"></script>
 <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="js/highcharts-regression.js"> </script>
-
-
+<script src="js/md55.js"> </script>
+<script>
+		function cifrar(){
+			md5(document.getElementById("pass"));
+		}
+	</script>
 <script>
 
 function doble(meses,md)
@@ -62,17 +66,15 @@ var it_tmp=0;
     
   while(it_tmp < meses.length)
   {
-vectmp.push([parseFloat.meses[it_tmp],md[it_tmp]]);
+vectmp.push([parseFloat(meses[it_tmp]),md[it_tmp]]);
 //vectmp.push(['hola','mundo']);
 console.log(vectmp[it_tmp]);
 it_tmp++;
 }
     return vectmp;
 }
-
-
     
-$(function (meses,md) {
+function grafica(meses,md) {
        
       var myString = doble(meses,md);
     
@@ -87,7 +89,7 @@ $(function (meses,md) {
             xAxis: {
                 title: {
                     enabled: true,
-                    text: 'Meses'
+                    text: 'Years'
                 },
                 startOnTick: true,
                 endOnTick: true,
@@ -95,7 +97,7 @@ $(function (meses,md) {
             },
             yAxis: {
                 title: {
-                    text: 'MD(Defecto medio)'
+                    text: 'MD(Mean Defect)'
                 }
             },
             legend: {
@@ -128,7 +130,7 @@ $(function (meses,md) {
                     },
                     tooltip: {
                         headerFormat: '<b>{series.name}</b><br>',
-                        pointFormat: '{point.x} cm, {point.y} kg'
+                        pointFormat: '{point.x} y, {point.y} dB'
                     }
                 }
             },
@@ -138,18 +140,20 @@ $(function (meses,md) {
                     type: 'linear',
                     color:  'rgba(223, 83, 83, .9)'
                 },
-                name: 'Female',
+                name: 'Points',
                 color: 'rgba(223, 83, 83, .5)',
                 data: myString
     
             }]
         });
-    });
+    }
     
 </script>
 <script type="text/javascript">
     
-    
+            var Pi=Math.PI; var PiD2=Pi/2; var PiD4=Pi/4; var Pi2=2*Pi
+            var e=2.718281828459045235; var e10 = 1.105170918075647625
+            var Deg=180/Pi//hsta aquí
             var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
             var dataBase = null;
 
@@ -266,8 +270,8 @@ $(function (meses,md) {
                 var meses = [];
                 var md = [];
                 var slv = [];
-                var resultadosmd =[];
-                var resultadoslv =[];
+                var pmd ;
+                var plv ;
               
                 objectDb.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
 
@@ -276,6 +280,9 @@ $(function (meses,md) {
                     if (result == null) {
                        return;
                     }
+                //var index = objectDb.index("by_dni");
+                //var request = index.get(calcMD5(document.querySelector("#dni1").value));
+                
                   
                    if(result.value.dni == dni){
                     
@@ -285,25 +292,28 @@ $(function (meses,md) {
                    md.push(parseFloat(result.value.md));
                    slv.push(parseFloat(result.value.slv).toFixed(4));
                    //resultados = linearRegression(md,meses);
-                   resultadosmd = linearRegression(md,meses);
-                   resultadoslv = linearRegression(slv,meses);
-                   console.log(resultadosmd);
-                   console.log(resultadoslv);
-                   
+                   pmd = linearRegression(md,meses);
+                   plv = linearRegression(slv,meses);
+                   console.log(pmd);
+                   console.log(plv);
+                
+                   if(pmd<=0.05 || plv<=0.05)
+                   console.log("Significant");  
+                   if(pmd>0.05 && plv>0.05)
+                   console.log("No Significant");
+                
                       //meses.push(result.value.anyo + (result.value.mes/12));
                   }
                     result.continue();
-                    //console.log('MD:',md);  
+                    //console.log('MD:',md); 
+                    
                 };
 
                 
               data.oncomplete = function() {
                   
                   var outerHTML = '';//creamos una variable para mostrar el código html
-                  console.log('##########');
                   //doble(meses,md);
-                  console.log('##########');
-
                     for (var key in meses,md) {//recorremos el array elements 
 
                         
@@ -315,39 +325,126 @@ $(function (meses,md) {
                             <td>\n\
                         </tr>';
                     }
-                    
-                    
-
+                  
+                    grafica(meses,md);
                     meses = [];//vaciamos elements
                     md = [];
                     document.querySelector("#elementsList").innerHTML = outerHTML;
                 };
             }
+    
+        function FishF(f,n1,n2) {
+                
+                var x=n2/(n1*f+n2)
+                if((n1%2)==0) 
+                { 
+                return StatCom(1-x,n2,n1+n2-4,n2-2)*Math.pow(x,n2/2) 
+                }
+                if((n2%2)==0){ return 1-StatCom(x,n1,n1+n2-4,n1-2)*Math.pow(1-x,n1/2) }
+                var th=Math.atan(Math.sqrt(n1*f/n2)); var a=th/PiD2; var sth=Math.sin(th); var cth=Math.cos(th)
+                if(n2>1) { a=a+sth*cth*StatCom(cth*cth,2,n2-3,-1)/PiD2 }
+                if(n1==1) { return 1-a }
+                var c=4*StatCom(sth*sth,n2+1,n1+n2-4,n2-2)*sth*Math.pow(cth,n2)/Pi
+                if(n2==1) { return 1-a+c/2 }
+                var k=2; while(k<=(n2-1)/2) {c=c*k/(k-.5); k=k+1 }
+                return 1-a+c}
+    
+        function Fmt(x) { 
+                var v
+                if(x>=0) { v=''+(x+0.00005) } else { v=''+(x-0.00005) }
+                return v.substring(0,v.indexOf('.')+5)
+                        }
+        function StatCom(q,i,j,b) {
+        
+        var zz=1; var z=zz; var k=i; while(k<=j) { zz=zz*q*k/(k-b); z=z+zz; k=k+2 }
+        return z}
 
         function linearRegression(y,x){
 
         var lr = {};
         var n = y.length;
+        var nx  = x.length;
         var sum_x = 0;
         var sum_y = 0;
         var sum_xy = 0;
         var sum_xx = 0;
         var sum_yy = 0;
+        var meanx = 0;
+        var meany = 0;
+        var vx=0;
+        var vy=0;
 
+        
         for (var i = 0; i < y.length; i++) {
 
             sum_x += parseFloat(x[i]);
+           // vx=vx+Math.pow(x[i]-meanx,2);
             sum_y += parseFloat(y[i]);
             sum_xy += (parseFloat(x[i])*parseFloat(y[i]));
             sum_xx += (parseFloat(x[i])*parseFloat(x[i]));
             sum_yy += (parseFloat(y[i])*parseFloat(y[i]));
         } 
+            
+        meanx = parseFloat(sum_x)/parseFloat(nx);
+        meany = parseFloat(sum_y)/parseFloat(n);
+            
+        for (var i = 0; i < y.length; i++) {
 
-        lr['slope'] = (n * sum_xy - sum_x * sum_y) / (n*sum_xx - sum_x * sum_x);//pendiente
+            vx=vx+Math.pow(parseFloat(x[i])-parseFloat(meanx),2);
+            vy=vy+Math.pow(parseFloat(y[i])-parseFloat(meany),2);
+        }
+         
+            var vx1 = vx/(nx-1);
+            var VX2 = Math.round(10000000*vx1)/10000000;
+            var vy1 = vy/(n-1);
+            var VY2 = Math.round(10000000*vy1)/10000000;
+            console.log('Vx: '+VX2);
+            console.log('Vy: '+VY2);
+            //console.log(meany);
+            
+            lr['slope'] = (n * sum_xy - sum_x * sum_y) / (n*sum_xx - sum_x * sum_x);
+            //f stadistic
+            var SSEF = parseFloat(VY2-(lr['slope']*lr['slope'])*VX2);
+            console.log('SSEF: '+ SSEF);
+            var SSRF = (parseFloat(Math.pow(lr['slope'],2)))*parseFloat(VX2);
+            console.log('SSRF: '+SSRF);
+            var MSEF = SSEF/(nx-2);
+            console.log('SSEF: '+SSEF);
+            var FVAL1 = SSRF/MSEF;
+            
+            
+            var Fp = FVAL1 + "";   //forcing to be a string
+            if (Fp.indexOf("Infinity") != -1) {
+            console.log('Too large'); 
+            }
+            else {  
+            var FVAL2 = Math.round(10000000*FVAL1);
+            var FVAL = FVAL2/10000000;
+            //form.FVAL.value =FVAL;
+            console.log('FVAL: '+ FVAL);   
+                
+            df1 = 1;
+            df2 = nx-2;
+        
+            var pf2 = Fmt(FishF(FVAL1,df1,df2));
+            if (Fp.indexOf("Infinity") != -1) {
+                        console.log(0); }
+            else {
+                        
+            var pp = pf2 + "";   //forcing to be a string
+                        if (pp.indexOf("e") != -1) {
+                                 console.log("Almost Zero"); }
+                        else {  
+                                console.log('P value md:'+pf2);
+                                }
+                        }       
+                       
+        //console.log('Mean x: '+meanx);
+        //console.log('Varianza x:'+ vx);
         lr['intercept'] = (sum_y - lr.slope * sum_x)/n;//intercepción
         lr['r2'] = Math.pow((n*sum_xy - sum_x*sum_y)/Math.sqrt((n*sum_xx-sum_x*sum_x)*(n*sum_yy-sum_y*sum_y)),2).toFixed(2);//coeficiente de determinación
             
-        return lr;
+        return pf2;
 
        // resultados.push(lr[r2]);
 
@@ -439,6 +536,7 @@ $(function (meses,md) {
                     document.querySelector("#elementsList").innerHTML = outerHTML;
                 };
             }
+        }
 
     </script>
 </head>
@@ -454,7 +552,8 @@ $(function (meses,md) {
 
     <script src="cordova.js"></script>
     <!-- "Phantom" cordova.js required for projects that use plugins -->
-
+    <script src="js/md5.js"> </script>
+    
     <script src="js/app.js"></script>
     <!-- for your event code, see README and file comments for details -->
     <script src="js/init-app.js"></script>
@@ -475,7 +574,7 @@ $(function (meses,md) {
         <hr>
         <div id="elements">
             <table>
-                <caption>Test</caption>
+                <caption>Tests</caption>
                 <thead>
                     <tr>
                         <th>Nº</th>

@@ -46,7 +46,8 @@
     <!-- <script src="lib/jq/jquery.js"></script> -->
 
     <link rel="stylesheet" href="css/app.css">
-<script type="text/javascript">
+    <script language="JavaScript" src="js/md55.js"></script>
+    <script type="text/javascript">
     
     
             var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -112,7 +113,7 @@
                 var data1 = active2.transaction(["pacientes"], "readwrite"); //array ,modo de transacción
                 var objectDb1 = data1.objectStore("pacientes");
                 var index1 = objectDb1.index("by_dni");
-                var request1 = index1.get(document.querySelector("#dni1").value);
+                var request1 = index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);
                 
                 request1.onsuccess = function () {
                 
@@ -134,16 +135,16 @@
                 var data = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
                 var objectDb = data.objectStore("pruebas");
                 var index = objectDb.index("by_dni");
-                var request = index.get(document.querySelector("#dni1").value);
+                var request = index.get(calcMD5(document.querySelector("#dni1").value));
            
                 
-                //aquí le pasaría el dni recogido en la otra página y le añadir´
+                //aquí le pasaría el dni recogido en la otra página y le añadiría
                 var request = objectDb.put({ 
                 md: document.querySelector("#md").value,
                 slv: slv1,
                 mes: document.querySelector("#mes").value,
                 anyo: document.querySelector("#anyo").value,
-                dni: document.querySelector("#dni1").value
+                dni: calcMD5(document.querySelector("#dni1").value)
                 });
            request.onerror = function (e) {
                     alert(request.error.name + '\n\n' + request.error.message);
@@ -151,12 +152,12 @@
 
                 data.oncomplete = function (e) { 
 
-                    document.querySelector('#dni1').value = '';
                     document.querySelector('#md').value = '';
                     document.querySelector('#slv').value = '';
                     document.querySelector('#mes').value = '';
                     document.querySelector('#anyo').value = '';
                     alert('The medical test has been created correctly');
+                    //passdata(document.querySelector("#dni1").value);    
                 };
                 };
             }
@@ -329,6 +330,19 @@
               } 
             } 
          }
+        
+        function passdata(dni){ 
+            myForm=document.f1 
+            //for(i=0;i<myForm.length-1;i++){ // run through form elements 
+            myString+=add_delimiters("dni1",dni) 
+            location.href = 'menu.html' + '?' + encodeURI(myString) 
+
+            function add_delimiters(n,v){ 
+                if(n!=""){ // add = and & characters to identify name and value pairs 
+                    return n+"="+v+"&"
+                } 
+            }
+        }
     
     
          
