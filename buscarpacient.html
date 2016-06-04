@@ -88,7 +88,7 @@
 
             // primero buscamos el registro a partir del dni
             var index = object.index("by_dni");
-            var request = index.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value));
+            var request = index.get(document.querySelector("#dni1").value);//calcMD5(document.querySelector("#dni1").value)
                 
              request.onerror = function(event) {
              alert("Why didn't you allow my web app to use IndexedDB?!");

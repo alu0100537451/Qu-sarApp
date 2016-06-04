@@ -113,7 +113,7 @@
                 var data1 = active2.transaction(["pacientes"], "readwrite"); //array ,modo de transacción
                 var objectDb1 = data1.objectStore("pacientes");
                 var index1 = objectDb1.index("by_dni");
-                var request1 = index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);
+                var request1 = index1.get(document.querySelector("#dni1").value);//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
                 
                 request1.onsuccess = function () {
                 
@@ -135,7 +135,8 @@
                 var data = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
                 var objectDb = data.objectStore("pruebas");
                 var index = objectDb.index("by_dni");
-                var request = index.get(calcMD5(document.querySelector("#dni1").value));
+                var request = index.get(document.querySelector("#dni1").value);//
+                //index.get(calcMD5(document.querySelector("#dni1").value));
            
                 
                 //aquí le pasaría el dni recogido en la otra página y le añadiría
@@ -144,7 +145,7 @@
                 slv: slv1,
                 mes: document.querySelector("#mes").value,
                 anyo: document.querySelector("#anyo").value,
-                dni: calcMD5(document.querySelector("#dni1").value)
+                dni:document.querySelector("#dni1").value//calcMD5(document.querySelector("#dni1").value)
                 });
            request.onerror = function (e) {
                     alert(request.error.name + '\n\n' + request.error.message);
@@ -157,7 +158,7 @@
                     document.querySelector('#mes').value = '';
                     document.querySelector('#anyo').value = '';
                     alert('The medical test has been created correctly');
-                    //passdata(document.querySelector("#dni1").value);    
+                    passdata(document.querySelector("#dni1").value);    
                 };
                 };
             }
@@ -343,8 +344,6 @@
                 } 
             }
         }
-    
-    
          
 
     </script>

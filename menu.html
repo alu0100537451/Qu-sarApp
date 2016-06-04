@@ -52,11 +52,7 @@
 <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="js/highcharts-regression.js"> </script>
 <script src="js/md55.js"> </script>
-<script>
-		function cifrar(){
-			md5(document.getElementById("pass"));
-		}
-	</script>
+
 <script>
 
 function doble(meses,md)
@@ -206,7 +202,7 @@ function grafica(meses,md) {
        tempArray2=tempArray1[i].split("=") // split the string at character = 
        document.f1.elements["dni1"].value=tempArray2[1] // assign the value 
        loadpruebas(tempArray2[1]);       
-       } 
+              } 
             } 
          }
     
@@ -265,13 +261,14 @@ function grafica(meses,md) {
                 var active = dataBase.result;
                 var data = active.transaction(["pruebas"], "readonly");
                 var objectDb = data.objectStore("pruebas");
-
+                var anyo=[];
                 var elements = [];
                 var meses = [];
+              var meses1 = [];
                 var md = [];
                 var slv = [];
-                var pmd ;
-                var plv ;
+                var pmd;
+                var plv;
               
                 objectDb.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
 
@@ -286,23 +283,34 @@ function grafica(meses,md) {
                   
                    if(result.value.dni == dni){
                     
-                      //elements.push(result.value);
-                   meses.push((parseFloat(result.value.anyo) + parseFloat(result.value.mes)/12).toFixed(2));
-                   meses.sort();//ordenación
+                    //elements.push(result.value);
+                   //any
+                   meses1.push(parseFloat(result.value.mes));
+                   anyo.push(parseFloat(result.value.anyo));
+                   //anyo.sort();    
+                   console.log('anyo:'+result.value.anyo);
+                   meses.push((parseFloat(result.value.anyo) + parseFloat(result.value.mes)/12).toFixed(4)); 
+                   //meses.sort();//ordenación
                    md.push(parseFloat(result.value.md));
-                   slv.push(parseFloat(result.value.slv).toFixed(4));
+                   slv.push(parseFloat(result.value.slv).toFixed(1));//1 decimal
                    //resultados = linearRegression(md,meses);
                    pmd = linearRegression(md,meses);
                    plv = linearRegression(slv,meses);
-                   console.log(pmd);
-                   console.log(plv);
+                   console.log("p-value md:" + pmd);
+                   console.log("p-value plv:" + plv);
+                   //p value
+                   //#Md/t 
+                   /*var mdp = md[0];
+                   var mdu = md[md.length-1];
+                   var ap= meses[0];
+                   var au= meses[meses.length-1];
+                   var t = au-ap;
+                   //console.log('u '+mdu);
+                   var pdm = (mdu-mdp)/t;
+                   //mostrar pdm,numero de pruebas*/
+                   
                 
-                   if(pmd<=0.05 || plv<=0.05)
-                   console.log("Significant");  
-                   if(pmd>0.05 && plv>0.05)
-                   console.log("No Significant");
-                
-                      //meses.push(result.value.anyo + (result.value.mes/12));
+                 //meses.push(result.value.anyo + (result.value.mes/12));
                   }
                     result.continue();
                     //console.log('MD:',md); 
@@ -314,12 +322,13 @@ function grafica(meses,md) {
                   
                   var outerHTML = '';//creamos una variable para mostrar el código html
                   //doble(meses,md);
-                    for (var key in meses,md) {//recorremos el array elements 
+                    for (var key in meses,md,anyo,meses1) {//recorremos el array elements 
 
                         
                         outerHTML += '\n\
                         <tr>\n\
-                            <td>' + meses[key] + '</td>\n\
+                            <td>' + meses1[key] + '</td>\n\
+                            <td>' + anyo[key] + '</td>\n\
                             <td>' + md[key] + '</td>\n\
                             <td>' + slv[key] + '</td>\n\
                             <td>\n\
@@ -359,7 +368,8 @@ function grafica(meses,md) {
         var zz=1; var z=zz; var k=i; while(k<=j) { zz=zz*q*k/(k-b); z=z+zz; k=k+2 }
         return z}
 
-        function linearRegression(y,x){
+    
+    function linearRegression(y,x){
 
         var lr = {};
         var n = y.length;
@@ -398,18 +408,18 @@ function grafica(meses,md) {
             var VX2 = Math.round(10000000*vx1)/10000000;
             var vy1 = vy/(n-1);
             var VY2 = Math.round(10000000*vy1)/10000000;
-            console.log('Vx: '+VX2);
-            console.log('Vy: '+VY2);
+            //console.log('Vx: '+VX2);
+            //console.log('Vy: '+VY2);
             //console.log(meany);
             
             lr['slope'] = (n * sum_xy - sum_x * sum_y) / (n*sum_xx - sum_x * sum_x);
             //f stadistic
             var SSEF = parseFloat(VY2-(lr['slope']*lr['slope'])*VX2);
-            console.log('SSEF: '+ SSEF);
+            //console.log('SSEF: '+ SSEF);
             var SSRF = (parseFloat(Math.pow(lr['slope'],2)))*parseFloat(VX2);
-            console.log('SSRF: '+SSRF);
+           // console.log('SSRF: '+SSRF);
             var MSEF = SSEF/(nx-2);
-            console.log('SSEF: '+SSEF);
+            //console.log('SSEF: '+SSEF);
             var FVAL1 = SSRF/MSEF;
             
             
@@ -420,8 +430,8 @@ function grafica(meses,md) {
             else {  
             var FVAL2 = Math.round(10000000*FVAL1);
             var FVAL = FVAL2/10000000;
-            //form.FVAL.value =FVAL;
-            console.log('FVAL: '+ FVAL);   
+            //form.FVAL.value = FVAL;
+            //console.log('FVAL: '+ FVAL);   
                 
             df1 = 1;
             df2 = nx-2;
@@ -435,7 +445,7 @@ function grafica(meses,md) {
                         if (pp.indexOf("e") != -1) {
                                  console.log("Almost Zero"); }
                         else {  
-                                console.log('P value md:'+pf2);
+                                //console.log('P value md:'+pf2);
                                 }
                         }       
                        
@@ -577,11 +587,10 @@ function grafica(meses,md) {
                 <caption>Tests</caption>
                 <thead>
                     <tr>
-                        <th>Nº</th>
-                        <th>MD</th>
-                        <th>sLv</th>
                         <th>Month</th>
                         <th>Year</th>
+                        <th>MD</th>
+                        <th>sLv</th>
                     </tr>
                 </thead>
                 <tbody id="elementsList">

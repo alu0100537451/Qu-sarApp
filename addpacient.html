@@ -86,7 +86,7 @@
                 var objectDb2 = data.objectStore("pacientes");
 
                 var request = objectDb2.put({
-                    dni:calcMD5(document.querySelector("#dni").value),//md5(document.querySelector("#dni").value)
+                    dni:document.querySelector("#dni").value,//calcMD5(document.querySelector("#dni").value
                     tipo: document.querySelector("#tipo").value
                 });
 
@@ -132,13 +132,8 @@
     <input type="text" id="dni" placeholder="Enter Nº History"/>
       <h3>Choose type</h3><hr>
       <form class="radiobutton">
-       <input type="radio" id="tipo" name="gender" value="O" checked style="
-    width: 20px;
-    margin-left: 1px;
-">Octopus
-       <input type="radio" id="tipo" name="gender" value="H" style=" 
-    width: 20px;
-    margin-left: 1px;">Humphrey
+    <input type="radio" id="tipo" name="gender" value="O" checked>Octopus
+       <input type="radio" id="tipo" name="gender" value="H">Humphrey
       </form><hr>
     
     <!--<input type="text" id="tipo" placeholder="Introduzca tipo"/>--> 
