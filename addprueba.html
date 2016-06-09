@@ -55,7 +55,7 @@
 
             function startDB() {
 
-                dataBase = indexedDB.open("objectDb4", 1);
+                dataBase = indexedDB.open("objectDb5", 1);
 
                 dataBase.onupgradeneeded = function (e) {
 
@@ -111,9 +111,9 @@
                 //pruebas
                 var active2 = dataBase.result; //conector con la base de datos
                 var data1 = active2.transaction(["pacientes"], "readwrite"); //array ,modo de transacción
-                var objectDb1 = data1.objectStore("pacientes");
-                var index1 = objectDb1.index("by_dni");
-                var request1 = index1.get(document.querySelector("#dni1").value);//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
+                var objectDb = data1.objectStore("pacientes");
+                var index1 = objectDb.index("by_dni");
+                var request1 = index1.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
                 
                 request1.onsuccess = function () {
                 
@@ -133,21 +133,18 @@
                     
                 var active = dataBase.result; //conector con la base de datos
                 var data = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
-                var objectDb = data.objectStore("pruebas");
-                var index = objectDb.index("by_dni");
-                var request = index.get(document.querySelector("#dni1").value);//
+                var objectDb1 = data.objectStore("pruebas");
+                var index = objectDb1.index("by_dni");
+                var request = index.get(calcMD5(document.querySelector("#dni1").value));//
                 //index.get(calcMD5(document.querySelector("#dni1").value));
-           
-                
                 //aquí le pasaría el dni recogido en la otra página y le añadiría
-                var request = objectDb.put({ 
+                var request = objectDb1.put({ 
                 md: document.querySelector("#md").value,
                 slv: slv1,
                 mes: document.querySelector("#mes").value,
-                anyo: document.querySelector("#anyo").value,
-                dni:document.querySelector("#dni1").value//calcMD5(document.querySelector("#dni1").value)
+                anyo: document.querySelector("#anyo").value, dni:calcMD5(document.querySelector("#dni1").value)//calcMD5(document.querySelector("#dni1").value)
                 });
-           request.onerror = function (e) {
+                request.onerror = function (e) {
                     alert(request.error.name + '\n\n' + request.error.message);
                 };
 
@@ -159,7 +156,7 @@
                     document.querySelector('#anyo').value = '';
                     alert('The medical test has been created correctly');
                     passdata(document.querySelector("#dni1").value);    
-                };
+                  };
                 };
             }
     
@@ -190,7 +187,8 @@
                     loadAll();
                 };
         }
-    function load(id) {
+    
+	          function load(id) {
                 var active = dataBase.result;
                 var data = active.transaction(["pacientes"], "readonly");
                 var object = data.objectStore("pacientes");
@@ -321,7 +319,8 @@
                     document.querySelector("#elementsList").innerHTML = outerHTML;
                 };
             }
-       function getData(){ 
+       
+	    function getData(){ 
            if (location.search.length > 0){ 
            dataPassed = decodeURI(location.search.substring(1)) 
            tempArray1=dataPassed.split("&") // split the string at character & and create an array of values  
@@ -332,10 +331,12 @@
             } 
          }
         
-        function passdata(dni){ 
+        function passdata(dni){
+            
             myForm=document.f1 
+            //myString="";
             //for(i=0;i<myForm.length-1;i++){ // run through form elements 
-            myString+=add_delimiters("dni1",dni) 
+            myString=add_delimiters("dni1",dni) 
             location.href = 'menu.html' + '?' + encodeURI(myString) 
 
             function add_delimiters(n,v){ 
@@ -376,20 +377,19 @@
     
     <div class="align-center">
         <form name="f1"> 
-        Nº History <input type="text" id="dni1" placeholder="dni" readonly/>
+        Nº History <input type="text" id="dni1" placeholder="dni" readonly/><br>
         </form>
-        Enter MD
-        <input type="text" id="md" placeholder="MD"/>
-        Enter sLv
-        <input type="text" id="slv" placeholder="sLv"/>
-        Enter Month 
-        <input type="text" id="mes" placeholder="Month"/>
-        Enter Year
-        <input type="text" id="anyo" placeholder="Year"/>
-        
+        Enter MD 
+        <input class="formu" type="text" id="md" placeholder="MD"/><br>
+        Enter sLv 
+        <input type="text" id="slv" placeholder="sLv"/><br>
+		<p>Enter Month</p> 
+        <input type="text" id="mes" placeholder="Month"/><br>
+        Enter Year 
+        <input type="text" id="anyo" placeholder="Year"/><br>
           
-          <button type="button" onclick="addprueba(dni1);">Save</button><hr>
           <button onClick="self.location='menu.html'">Main Menu</button>
+		  <button type="button" onclick="addprueba(dni1);">Save</button><hr>
           <button onClick="self.location='index.html'">Home page</button> 
         
     </div>

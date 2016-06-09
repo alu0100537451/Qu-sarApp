@@ -3,7 +3,6 @@
 <!--
   * Please see the included README.md file for license terms and conditions.
   -->
-
 <head>
     <title>QuasarApp</title>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
@@ -54,7 +53,7 @@
 
             function startDB() {
 
-                dataBase = indexedDB.open("objectDb4", 1);
+                dataBase = indexedDB.open("objectDb5", 1);
 
                 dataBase.onupgradeneeded = function (e) {
 
@@ -66,7 +65,9 @@
                     var objectDb1 = active.createObjectStore("pruebas", {
                     keyPath: 'id',
                     autoIncrement: true
-                   });              
+				    
+                  }); 
+                    objectDb1.createIndex('by_dni', 'dni', {unique: false});
                 };
                 
                 dataBase.onsuccess = function (e) {
@@ -107,7 +108,7 @@
     <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work above -->
     <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
     <h1>Welcome to QuasarApp</h1>
-    <div>
+    <div id="home">
     <button onClick="self.location='addpacient.html'">Create Patient</button><hr>    
     <button onclick="self.location='buscarpacient.html'">Patient Search</button><hr>
     <button onclick="self.location='help.html'">FAQ</button> 

@@ -54,25 +54,11 @@
 <script src="js/md55.js"> </script>
 
 <script>
-
-function doble(meses,md)
-{
-var vectmp=new Array();
-var it_tmp=0;
     
-  while(it_tmp < meses.length)
-  {
-vectmp.push([parseFloat(meses[it_tmp]),md[it_tmp]]);
-//vectmp.push(['hola','mundo']);
-console.log(vectmp[it_tmp]);
-it_tmp++;
-}
-    return vectmp;
-}
-    
-function grafica(meses,md) {
+function grafica(md,slv) {
        
-      var myString = doble(meses,md);
+      var myString = md;
+      var myString2 = slv;
     
         $('#container').highcharts({
             chart: {
@@ -93,7 +79,7 @@ function grafica(meses,md) {
             },
             yAxis: {
                 title: {
-                    text: 'MD(Mean Defect)'
+                    text: 'MD(Mean Defect)/sLv'
                 }
             },
             legend: {
@@ -140,6 +126,18 @@ function grafica(meses,md) {
                 color: 'rgba(223, 83, 83, .5)',
                 data: myString
     
+            }, 
+            {
+                regression: true ,
+                regressionSettings: {
+                    type: 'linear',
+                    color:  'rgba(223, 83, 83, .9)'
+                },
+                name: 'Points',
+                color: 'rgba(223, 83, 83, .5)',
+                data: myString2
+            
+                    
             }]
         });
     }
@@ -155,7 +153,7 @@ function grafica(meses,md) {
 
           function startDB() {
  
-                dataBase = indexedDB.open("objectDb4", 1);
+                dataBase = indexedDB.open("objectDb5", 1);
 
                 dataBase.onupgradeneeded = function (e) {
 
@@ -205,6 +203,19 @@ function grafica(meses,md) {
               } 
             } 
          }
+      
+     function doble(meses,valor){
+     var vectmp=new Array();
+     var it_tmp=0;
+    
+     while(it_tmp < meses.length)
+     {
+      vectmp.push([parseFloat(meses[it_tmp]),valor[it_tmp]]);
+      //vectmp.push(['hola','mundo']);
+      //console.log(vectmp[it_tmp]);
+      it_tmp++;  
+      }
+       return vectmp;}
     
      function load(id) {
                 var active = dataBase.result;
@@ -269,6 +280,8 @@ function grafica(meses,md) {
                 var slv = [];
                 var pmd;
                 var plv;
+                var stringmd=[];
+                var stringslv=[];
               
                 objectDb.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
 
@@ -281,40 +294,43 @@ function grafica(meses,md) {
                 //var request = index.get(calcMD5(document.querySelector("#dni1").value));
                 
                   
-                   if(result.value.dni == dni){
-                    
-                    //elements.push(result.value);
-                   //any
+                   if(document.querySelector("#dni1").value == dni){
+                   
                    meses1.push(parseFloat(result.value.mes));
                    anyo.push(parseFloat(result.value.anyo));
                    //anyo.sort();    
-                   console.log('anyo:'+result.value.anyo);
-                   meses.push((parseFloat(result.value.anyo) + parseFloat(result.value.mes)/12).toFixed(4)); 
-                   //meses.sort();//ordenación
+                   //console.log('anyo:'+result.value.anyo);
+                   meses.push((parseFloat(result.value.anyo) + parseFloat(result.value.mes-1)/12).toFixed(4)); 
+                   meses.sort();//ordenación
                    md.push(parseFloat(result.value.md));
-                   slv.push(parseFloat(result.value.slv).toFixed(1));//1 decimal
+                   slv.push(parseFloat(result.value.slv));//1 decimal
                    //resultados = linearRegression(md,meses);
                    pmd = linearRegression(md,meses);
                    plv = linearRegression(slv,meses);
-                   console.log("p-value md:" + pmd);
-                   console.log("p-value plv:" + plv);
-                   //p value
-                   //#Md/t 
-                   /*var mdp = md[0];
+                   stringmd=doble(meses,md);
+                   stringslv=doble(meses,slv);
+                   //#Md/t
+                   var mdp = md[0];
+				   console.log('mdp:'+mdp);
                    var mdu = md[md.length-1];
+				   console.log('mdu:'+mdu);
                    var ap= meses[0];
+				   console.log('año primero'+ap);
                    var au= meses[meses.length-1];
+				   console.log('año ultimo'+au);
                    var t = au-ap;
+				   console.log('tiempo:'+t);
                    //console.log('u '+mdu);
                    var pdm = (mdu-mdp)/t;
+				   console.log('pdm'+pdm)
                    //mostrar pdm,numero de pruebas*/
-                   
-                
                  //meses.push(result.value.anyo + (result.value.mes/12));
                   }
+					console.log("p-value md:" + pmd);
+                    console.log("p-value plv:" + plv);
+					//console.log(pdm);
                     result.continue();
                     //console.log('MD:',md); 
-                    
                 };
 
                 
@@ -322,11 +338,10 @@ function grafica(meses,md) {
                   
                   var outerHTML = '';//creamos una variable para mostrar el código html
                   //doble(meses,md);
-                    for (var key in meses,md,anyo,meses1) {//recorremos el array elements 
-
-                        
+                    for (var key in meses,meses1) {//recorremos el array elements 
                         outerHTML += '\n\
                         <tr>\n\
+                            <td>' + meses[key] + '</td>\n\
                             <td>' + meses1[key] + '</td>\n\
                             <td>' + anyo[key] + '</td>\n\
                             <td>' + md[key] + '</td>\n\
@@ -334,8 +349,9 @@ function grafica(meses,md) {
                             <td>\n\
                         </tr>';
                     }
-                  
-                    grafica(meses,md);
+                    
+				    if(md.length >4)
+                    grafica(stringmd,stringslv);
                     meses = [];//vaciamos elements
                     md = [];
                     document.querySelector("#elementsList").innerHTML = outerHTML;
@@ -369,7 +385,7 @@ function grafica(meses,md) {
         return z}
 
     
-    function linearRegression(y,x){
+        function linearRegression(y,x){
 
         var lr = {};
         var n = y.length;
@@ -562,8 +578,6 @@ function grafica(meses,md) {
 
     <script src="cordova.js"></script>
     <!-- "Phantom" cordova.js required for projects that use plugins -->
-    <script src="js/md5.js"> </script>
-    
     <script src="js/app.js"></script>
     <!-- for your event code, see README and file comments for details -->
     <script src="js/init-app.js"></script>
@@ -578,7 +592,7 @@ function grafica(meses,md) {
     <h1>Main menu</h1>
     <div class="align-center">
     <form name="f1"> 
-    NºHistory<input type="text" name="dni1" id="dni1" size="5" readonly>
+    NºHistory <input type="text" name="dni1" id="dni1" size="5" readonly>
     </form>
     <div class="align-center">
         <hr>
@@ -601,7 +615,7 @@ function grafica(meses,md) {
             </table>
         </div>
     <h1></h1>
-     <div id="container" style="height: 400px; min-width: 310px"></div>
+     <div id="container" class="margin_b"></div>
     </div>
         <button onClick="passdata();">Add test</button><br>    
         <button onclick="self.location='buscarpacient.html'">Search patient</button><br>

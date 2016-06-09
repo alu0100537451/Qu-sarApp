@@ -44,7 +44,6 @@
     <!-- <script src="lib/jq/jquery.js"></script> -->
     <script language="JavaScript" src="js/md55.js"></script>
     <link rel="stylesheet" href="css/app.css">
-    <link rel="stylesheet" href="css/app.css">
     <script type="text/javascript">
     
     
@@ -53,7 +52,7 @@
 
             function startDB() {
 
-                dataBase = indexedDB.open("objectDb4", 1);
+                dataBase = indexedDB.open("objectDb5", 1);
 
                 dataBase.onupgradeneeded = function (e) {
 
@@ -79,15 +78,15 @@
 
             }
             
-            function addpacient() {
+            function addpacient(t) {
                
                 var active = dataBase.result;
                 var data = active.transaction(["pacientes"], "readwrite");
                 var objectDb2 = data.objectStore("pacientes");
 
                 var request = objectDb2.put({
-                    dni:document.querySelector("#dni").value,//calcMD5(document.querySelector("#dni").value
-                    tipo: document.querySelector("#tipo").value
+                    dni: calcMD5(document.querySelector("#dni").value),//calcMD5(document.querySelector("#dni").value
+                    tipo: t
                 });
 
                 request.onerror = function (e) {
@@ -97,7 +96,7 @@
                 data.oncomplete = function (e) {
                     alert('The patient has been created successfully');
                     document.querySelector('#dni').value = '';
-                    document.querySelector('#tipo').value = '';
+                    //document.querySelector('#tipo').value = '';
                     //loadAll();
                         };
                  }                
@@ -131,13 +130,14 @@
     <div>
     <input type="text" id="dni" placeholder="Enter Nº History"/>
       <h3>Choose type</h3><hr>
-      <form class="radiobutton">
-    <input type="radio" id="tipo" name="gender" value="O" checked>Octopus
-       <input type="radio" id="tipo" name="gender" value="H">Humphrey
+      
+      <form>
+          <button onclick="addpacient('O');" id="tipoO" name="gender" >Octopus</button>
+          <button onclick="addpacient('H');" id="tipoH" name="gender">Humphrey</button>
       </form><hr>
     
     <!--<input type="text" id="tipo" placeholder="Introduzca tipo"/>--> 
-    <button type="button" onclick="addpacient();">Add</button><br>
+    <!--<button type="button" onclick="addpacient();">Add</button><br>-->
     <button onClick="self.location='index.html'">Home page</button>
     </div>
 </body>

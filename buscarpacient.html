@@ -56,7 +56,7 @@
 
             function startDB() {
 
-                dataBase = indexedDB.open("objectDb4", 1);
+                dataBase = indexedDB.open("objectDb5", 1);
 
                 dataBase.onupgradeneeded = function (e) {
 
@@ -88,18 +88,23 @@
 
             // primero buscamos el registro a partir del dni
             var index = object.index("by_dni");
-            var request = index.get(document.querySelector("#dni1").value);//calcMD5(document.querySelector("#dni1").value)
+            var request = index.get(calcMD5(document.querySelector("#dni1").value));//calcMD5(document.querySelector("#dni1").value)
                 
              request.onerror = function(event) {
              alert("Why didn't you allow my web app to use IndexedDB?!");
              };
             // cuando se encuentre el registro, lo borramos
             request.onsuccess = function () {
+            if(request.result == undefined)
+            {
+             alert('error');   
+            }else{
             var result = request.result;
             alert("Si existe el paciente y tiene ID: ");
             //anterior antes de md5 passdata(result.dni);
             passdata(document.querySelector("#dni1").value);
             //object.delete(result.id);
+              }
             };
         }
             
@@ -149,7 +154,7 @@
         Introduce NºHistoria<input type="text" name="text1" value="NºHistoria" size="5"> 
         <input type="button" value="Buscar" onclick="passdata()"> -->
         <h2>Patient search</h2>
-        <input type="text" id="dni1" placeholder="Enter NºHistory"/>
+        <input class="margin_b" type="text" id="dni1" placeholder="Enter NºHistory"/>
     
         <button type="button" onclick="buscarpacient(dni1);">Search</button><hr>
     </form>

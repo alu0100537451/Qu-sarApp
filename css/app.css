@@ -45,13 +45,14 @@ textarea {
     -moz-user-select: text;
     -ms-user-select: text;
     user-select: text;
-     background-color: rgb(255, 255, 255);
+    background-color: rgb(255, 255, 255);
     width: 100%;
     height: 60px;
     border: rgb(153, 153, 153) 1px solid;
     font: normal 14px/120% "Intel Clear W Italic", Arial, sans-serif;
     color: rgb(51, 51, 51);
     text-align: center;
+	margin-right: auto;
     
 }
 
@@ -132,5 +133,20 @@ h2 {
       border-radius: 2px;
       color: #fff; 
     width: 200px;
+}
 
+@media screen and (max-width: 650px) {
+	#container{
+		display: none;
+		
+	}
+}
+
+.margin_b
+{
+	margin-bottom: 5%;
+}
+
+.input_ancho{
+	width: 150px
 }
