@@ -47,9 +47,9 @@
 
     <link rel="stylesheet" href="css/app.css">
 
-<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-<script src="http://code.highcharts.com/stock/highstock.js"></script>
-<script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="js/jquery-2.1.3.min.js"></script>
+<script src="js/highstock.js"></script>
+<script src="js/exporting.js"></script>
 <script src="js/highcharts-regression.js"> </script>
 <script src="js/md55.js"> </script>
 
@@ -120,9 +120,9 @@ function grafica(md,slv) {
                 regression: true ,
                 regressionSettings: {
                     type: 'linear',
-                    color:  'rgba(223, 83, 83, .9)'
+                    color:  'red'
                 },
-                name: 'Points',
+                name: 'Points slv',
                 color: 'rgba(223, 83, 83, .5)',
                 data: myString
     
@@ -131,9 +131,9 @@ function grafica(md,slv) {
                 regression: true ,
                 regressionSettings: {
                     type: 'linear',
-                    color:  'rgba(223, 83, 83, .9)'
+                    color:  'blue'
                 },
-                name: 'Points',
+                name: 'Points MD',
                 color: 'rgba(223, 83, 83, .5)',
                 data: myString2
             
@@ -153,7 +153,7 @@ function grafica(md,slv) {
 
           function startDB() {
  
-                dataBase = indexedDB.open("objectDb5", 1);
+                dataBase = indexedDB.open("objectDb9", 1);
 
                 dataBase.onupgradeneeded = function (e) {
 
@@ -275,13 +275,17 @@ function grafica(md,slv) {
                 var anyo=[];
                 var elements = [];
                 var meses = [];
-              var meses1 = [];
+                var meses1 = [];
                 var md = [];
                 var slv = [];
                 var pmd;
                 var plv;
                 var stringmd=[];
                 var stringslv=[];
+			    var pdm;
+			    var mesespdm=[];
+			    var sig;
+			    var ord=[];
               
                 objectDb.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
 
@@ -290,18 +294,14 @@ function grafica(md,slv) {
                     if (result == null) {
                        return;
                     }
-                //var index = objectDb.index("by_dni");
-                //var request = index.get(calcMD5(document.querySelector("#dni1").value));
-                
-                  
-                   if(document.querySelector("#dni1").value == dni){
-                   
+				
+                   if(result.value.dni == calcMD5(dni))
+				   {
                    meses1.push(parseFloat(result.value.mes));
                    anyo.push(parseFloat(result.value.anyo));
-                   //anyo.sort();    
-                   //console.log('anyo:'+result.value.anyo);
+				   ord.push(parseFloat(result.value.orde));
                    meses.push((parseFloat(result.value.anyo) + parseFloat(result.value.mes-1)/12).toFixed(4)); 
-                   meses.sort();//ordenación
+                   //meses.sort();//ordenación
                    md.push(parseFloat(result.value.md));
                    slv.push(parseFloat(result.value.slv));//1 decimal
                    //resultados = linearRegression(md,meses);
@@ -309,28 +309,74 @@ function grafica(md,slv) {
                    plv = linearRegression(slv,meses);
                    stringmd=doble(meses,md);
                    stringslv=doble(meses,slv);
-                   //#Md/t
-                   var mdp = md[0];
+				   console.log("p-value md:" + pmd);
+                   console.log("p-value plv:" + plv);
+                   
+				   var mini; 
+				   var tmp=ord[0];
+				   for (var x in ord){
+					   if(tmp>=ord[x]){
+						   tmp=ord[x];
+						   mini=x;
+					   }
+				   }
+				   
+					   
+					   
+				   var max;
+				        tmp=ord[0];
+				   for (var y in ord){
+					   if(tmp<ord[x]){
+						   tmp=ord[x];
+						   max=x;
+					   }
+					   
+					}
+				   
+				   
+				  /* alert('md max:'+md[max]+'\n'+
+						'an pri:'+anyo[mini]+'\n'+
+						'mes max:'+meses1[max]+'\n'+
+						'a max:'+anyo[max]+'\n');   */
+					   
+				   //#Md/t
+				   /*for (x in meses)
+					{
+				   mesespdm[x] = meses1[x];
+					}*/
+					  //mesespdm
+				   //meses.sort(meses1,anyo);
+				   //md.sort();
+                   var mdp = md[mini];//defecto medio
 				   console.log('mdp:'+mdp);
-                   var mdu = md[md.length-1];
+                   var mdu = md[max];
 				   console.log('mdu:'+mdu);
-                   var ap= meses[0];
+                   var msp= meses1[mini];
+				   console.log('mes primero '+msp);
+                   var msu= meses1[max];  
+				   console.log('mes ultimo'+msu);
+				   var ap= anyo[mini];
 				   console.log('año primero'+ap);
-                   var au= meses[meses.length-1];
-				   console.log('año ultimo'+au);
-                   var t = au-ap;
+                   var au= anyo[max];
+				   console.log('año ultimo: '+au);
+                   var t = (au+(msu/12))-(ap+(msp/12));
 				   console.log('tiempo:'+t);
                    //console.log('u '+mdu);
-                   var pdm = (mdu-mdp)/t;
-				   console.log('pdm'+pdm)
+                   pdm = (mdu-mdp)/t;
+				   console.log('dB/y: '+pdm)
                    //mostrar pdm,numero de pruebas*/
                  //meses.push(result.value.anyo + (result.value.mes/12));
-                  }
-					console.log("p-value md:" + pmd);
-                    console.log("p-value plv:" + plv);
-					//console.log(pdm);
+				    if(pmd<=0.05 || plv<=0.05)
+                    //console.log('Significant');
+					sig='Significant';
+					alert('aproximado');
+				 	if(pmd>0.05 & plv>0.05)
+                    console.log('No Significant');
+					sig='No Significant';
+				   }
+					//console.log(pdm)
                     result.continue();
-                    //console.log('MD:',md); 
+                     
                 };
 
                 
@@ -338,18 +384,23 @@ function grafica(md,slv) {
                   
                   var outerHTML = '';//creamos una variable para mostrar el código html
                   //doble(meses,md);
+				    //if(md.length>=1)
                     for (var key in meses,meses1) {//recorremos el array elements 
                         outerHTML += '\n\
                         <tr>\n\
-                            <td>' + meses[key] + '</td>\n\
                             <td>' + meses1[key] + '</td>\n\
-                            <td>' + anyo[key] + '</td>\n\
+							<td>' + anyo[key] + '</td>\n\
                             <td>' + md[key] + '</td>\n\
-                            <td>' + slv[key] + '</td>\n\
+                            <td>' + slv[key].toFixed(3) + '</td>\n\
                             <td>\n\
                         </tr>';
-                    }
-                    
+					}
+				     if(md.length>4)
+				      outerHTML+='\n\
+				     <tr>\n\
+				     <td>dB/y: ' + pdm + ' Resultado: ' + sig + '</td>\n\
+					  </tr>';
+				  
 				    if(md.length >4)
                     grafica(stringmd,stringslv);
                     meses = [];//vaciamos elements
@@ -374,7 +425,7 @@ function grafica(md,slv) {
                 var k=2; while(k<=(n2-1)/2) {c=c*k/(k-.5); k=k+1 }
                 return 1-a+c}
     
-        function Fmt(x) { 
+          function Fmt(x) { 
                 var v
                 if(x>=0) { v=''+(x+0.00005) } else { v=''+(x-0.00005) }
                 return v.substring(0,v.indexOf('.')+5)
@@ -607,6 +658,7 @@ function grafica(md,slv) {
                         <th>sLv</th>
                     </tr>
                 </thead>
+				<caption>Resultados</caption>
                 <tbody id="elementsList">
                     <tr>
                         <td colspan="3">Not elements to show</td>
@@ -619,7 +671,7 @@ function grafica(md,slv) {
     </div>
         <button onClick="passdata();">Add test</button><br>    
         <button onclick="self.location='buscarpacient.html'">Search patient</button><br>
-        <button onclick="self.location='index.html'">Exit</button>
+        <button onclick="self.location='index.html'">Home page</button>
 </div>
 <!--    <button onclick="showInterstitial()">Show Interstitial Ad</button>-->
 </body>

@@ -55,7 +55,7 @@
 
             function startDB() {
 
-                dataBase = indexedDB.open("objectDb9", 1);
+                dataBase = indexedDB.open("objectDb7", 1);
 
                 dataBase.onupgradeneeded = function (e) {
 
@@ -119,7 +119,7 @@
                 
                 md1 = parseFloat(document.querySelector("#md").value);
                 slv1 = parseFloat(document.querySelector("#slv").value);
-                var result = request1.result;
+                var result= request1.result;
                 tipo1 = result.tipo;
                 //alert('hola'+tipo1);
                 if( md1 >16.33 && tipo1 == "O" )//octopus
@@ -145,8 +145,7 @@
                 md: document.querySelector("#md").value,
                 slv: slv1,
                 mes: document.querySelector("#mes").value,
-                anyo: document.querySelector("#anyo").value,
-			    orde: parseFloat(( parseFloat(document.querySelector("#mes").value))+(12* parseFloat((document.querySelector("#anyo").value)-2000))), dni:calcMD5(document.querySelector("#dni1").value)//calcMD5(document.querySelector("#dni1").value)
+                anyo: document.querySelector("#anyo").value, dni:calcMD5(document.querySelector("#dni1").value)//calcMD5(document.querySelector("#dni1").value)
                 });
                 request.onerror = function (e) {
                     alert(request.error.name + '\n\n' + request.error.message);
@@ -384,13 +383,13 @@
         Nº History <input type="text" id="dni1" placeholder="dni" readonly/><br>
         </form>
         Enter MD 
-        <input class="formu" type="text" id="md" placeholder="MD" required pattern="[0-9]{0,}"/><br>
-        Enter slv
-        <input type="text" id="slv" placeholder="sLv" required pattern="[0-9]{0,}"/><br>
+        <input class="formu" type="text" id="md" placeholder="MD"/><br>
+        Enter sLv 
+        <input type="text" id="slv" placeholder="sLv"/><br>
 		<p>Enter Month</p> 
-        <input type="text" id="mes" placeholder="Month" required pattern="[0-9]{0,}"/><br>
+        <input type="text" id="mes" placeholder="Month"/><br>
         Enter Year 
-        <input type="text" id="anyo" placeholder="Year" required pattern="[0-9]{0,}"/><br>
+        <input type="text" id="anyo" placeholder="Year"/><br>
           
           <button onClick="self.location='menu.html'">Main Menu</button>
 		  <button type="button" onclick="addprueba(dni1);">Save</button><hr>

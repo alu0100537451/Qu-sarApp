@@ -52,7 +52,7 @@
 
             function startDB() {
 
-                dataBase = indexedDB.open("objectDb5", 1);
+                dataBase = indexedDB.open("objectDb9", 1);
 
                 dataBase.onupgradeneeded = function (e) {
 
@@ -128,7 +128,7 @@
     <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
     <h1>Create patient</h1>
     <div>
-    <input type="text" id="dni" placeholder="Enter Nº History"/>
+    <input type="text" id="dni" placeholder="Enter Nº History" pattern="[0-9]{0,12}"/>
       <h3>Choose type</h3><hr>
       
       <form>

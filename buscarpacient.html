@@ -56,7 +56,7 @@
 
             function startDB() {
 
-                dataBase = indexedDB.open("objectDb5", 1);
+                dataBase = indexedDB.open("objectDb9", 1);
 
                 dataBase.onupgradeneeded = function (e) {
 
@@ -97,7 +97,7 @@
             request.onsuccess = function () {
             if(request.result == undefined)
             {
-             alert('error');   
+             alert('No existe ese paciente');   
             }else{
             var result = request.result;
             alert("Si existe el paciente y tiene ID: ");
@@ -107,6 +107,162 @@
               }
             };
         }
+		
+		    function deletedni() {
+				
+			 //pruebas
+                var active2 = dataBase.result; //conector con la base de datos
+                var data1 = active2.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
+                var objectDb = data1.objectStore("pruebas");
+                var index1 = objectDb.index("by_dni");
+                var request1 = index1.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
+                
+                request1.onsuccess = function () {
+                
+				var result = request1.result;
+				
+				if(result.dni == calcMD5(document.querySelector("#dni1").value))
+				  {
+				  objectDb.delete(result.id);
+                
+				  }
+			  
+			  }
+			
+                var active = dataBase.result; //conector con la base de datos
+                var data1 = active.transaction(["pacientes"], "readwrite"); //array ,modo de transacción
+                var objectDb2 = data1.objectStore("pacientes");
+                var index = objectDb2.index("by_dni");
+                var request = index.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
+                
+                request.onsuccess = function () {
+                
+				var result1 = request.result;
+			
+				objectDb2.delete(result1.id);
+                
+				  }
+			   
+			  }
+            
+		 
+		  function borraprueba(){
+			  
+           //
+                //pruebas
+                var active2 = dataBase.result; //conector con la base de datos
+                var data1 = active2.transaction(["pacientes"], "readwrite"); //array ,modo de transacción
+                var objectDb = data1.objectStore("pacientes");
+                var index1 = objectDb.index("by_dni");
+                var request1 = index1.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
+                
+                request1.onsuccess = function () {
+                
+                md1 = parseFloat(document.querySelector("#md").value);
+                slv1 = parseFloat(document.querySelector("#slv").value);
+                var result = request1.result;
+                tipo1 = result.tipo;
+                //alert('hola'+tipo1);
+                if( md1 >16.33 && tipo1 == "O" )//octopus
+                {
+                    //alert('estoy aquí');
+                  slv1 = slv1 + ((md1-16.33)/0.84);
+                  //alert('hola'+slv1);
+				  //alert(slv1);
+                 }else if( md1 <-17.35 && tipo1 =="H"){ //humfrey
+                  slv1 = slv1 + ((md1+17.35)/0.84)
+				  //alert(md1);
+				  //alert(slv1);
+                 }
+                    
+                var active = dataBase.result; //conector con la base de datos
+                var data = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
+                var objectDb1 = data.objectStore("pruebas");
+                var index = objectDb1.index("by_dni");
+                var request = index.get(calcMD5(document.querySelector("#dni1").value));//
+                //index.get(calcMD5(document.querySelector("#dni1").value));
+                //aquí le pasaría el dni recogido en la otra página y le añadiría
+                var request = objectDb1.put({ 
+                md: document.querySelector("#md").value,
+                slv: slv1,
+                mes: document.querySelector("#mes").value,
+                anyo: document.querySelector("#anyo").value, dni:calcMD5(document.querySelector("#dni1").value)//calcMD5(document.querySelector("#dni1").value)
+                });
+                request.onerror = function (e) {
+                    alert(request.error.name + '\n\n' + request.error.message);
+                };
+
+                data.oncomplete = function (e) { 
+
+                    document.querySelector('#md').value = '';
+                    document.querySelector('#slv').value = '';
+                    document.querySelector('#mes').value = '';
+                    document.querySelector('#anyo').value = '';
+                    alert('The medical test has been created correctly');
+                    passdata(document.querySelector("#dni1").value);    
+                  };
+                };
+            }
+			  
+			  
+			  
+			  
+			  
+			  
+		
+    
+				
+			//borra primeros las pruebas del paciente y luego el paciente
+
+                /*
+                var active = dataBase.result; //conector con la base de datos
+                var data = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
+                var objectDb1 = data.objectStore("pruebas");
+                var index = objectDb1.index("by_dni");
+                var request = index.get(calcMD5(document.querySelector("#dni1").value));//
+                //index.get(calcMD5(document.querySelector("#dni1").value));
+                //aquí le pasaría el dni recogido en la otra página y le añadiría
+			    
+
+            	// cuando se encuentre el registro, lo borramos
+            	request.onsuccess = function () {
+            	var result = request.result;
+		    
+		    	if(result.dni == calcMD5(document.querySelector("#dni1").value)){
+            	alert("ID: " + result.id );
+            	objectDb1.delete(result.id);
+			     }
+               };   
+			
+			   var active2 = dataBase.result;
+               var data1 = active2.transaction(["pacientes"],"readwrite");
+               var object2 = data1.objectStore("pacientes");    
+
+               // primero buscamos el registro a partir del dni
+               var index1 = object2.index("by_dni");
+               var request1 = index.get(calcMD5(document.querySelector("#dni1").value));
+            
+               // cuando se encuentre el registro, lo borramos
+           	   request1.onsuccess = function () {
+			   var result1 = request.result;
+		       // Pedimos al usuario que introduzca su nombre
+               /*var nombre = prompt("Introduzca su nombre");
+		       // Pedimos confirmación
+		       if(confirm("¿Estas seguro de que quieres eliminar el paciente con nºhistoria: " + document.querySelector("#dni1").value +"?")) {
+		       // Respuesta afirmativa...
+		       }
+               object2.delete(result1.id);
+               };
+            
+               request.onerror = function (e) {
+                    alert(request.error.name + '\n\n' + request.error.message);
+                };
+
+                data.oncomplete = function (e) { 
+                    
+                    alert('Eliminado');
+                };
+        }*/
             
         function passdata(dni){ 
             myForm=document.f1 
@@ -156,7 +312,8 @@
         <h2>Patient search</h2>
         <input class="margin_b" type="text" id="dni1" placeholder="Enter NºHistory"/>
     
-        <button type="button" onclick="buscarpacient(dni1);">Search</button><hr>
+        <button type="button" onclick="buscarpacient(dni1);">Search</button>
+		<button type="button" onclick="deletedni(dni1);">Delete</button>  
     </form>
         <button onClick="self.location='index.html'">Home page</button>  
         
