@@ -73,6 +73,7 @@
                 dataBase.onsuccess = function (e) {
                     //alert('Database loaded');
                     //loadAll();
+					getData();
                 };
 
                 dataBase.onerror = function (e) {
@@ -81,90 +82,48 @@
 
             }
             
-            function addpacient() {
-               
-                var active = dataBase.result;
-                var data = active.transaction(["pacientes"], "readwrite");
-                var objectDb = data.objectStore("pacientes");
-
-                var request = objectDb.put({
-                    dni: document.querySelector("#dni").value,
-                    tipo: document.querySelector("#tipo").value
-                });
-
-                request.onerror = function (e) {
-                    alert(request.error.name + '\n\n' + request.error.message);
-                };
-
-                data.oncomplete = function (e) {
-
-                    document.querySelector('#dni').value = '';
-                    document.querySelector('#tipo').value = '';
-                    alert('Paciente creado correctamente');
-                    loadAll();
-                };
-
-            }
+     
     
-       function addprueba() {
-           //
-                //pruebas
-                var active2 = dataBase.result; //conector con la base de datos
-                var data1 = active2.transaction(["pacientes"], "readwrite"); //array ,modo de transacción
-                var objectDb = data1.objectStore("pacientes");
-                var index1 = objectDb.index("by_dni");
-                var request1 = index1.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
-                
-                request1.onsuccess = function () {
-                
-                md1 = parseFloat(document.querySelector("#md").value);
-                slv1 = parseFloat(document.querySelector("#slv").value);
-                var result = request1.result;
-                tipo1 = result.tipo;
-                //alert('hola'+tipo1);
-                if( md1 >16.33 && tipo1 == "O" )//octopus
-                {
-                    //alert('estoy aquí');
-                  slv1 = slv1 + ((md1-16.33)/0.84);
-                  //alert('hola'+slv1);
-				  //alert(slv1);
-                 }else if( md1 <-17.35 && tipo1 =="H"){ //humfrey
-                  slv1 = slv1 + ((md1+17.35)/0.84)
-				  //alert(md1);
-				  //alert(slv1);
-                 }
-                    
+            function deleteprueba() {
+		     
                 var active = dataBase.result; //conector con la base de datos
-                var data = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
-                var objectDb1 = data.objectStore("pruebas");
-                var index = objectDb1.index("by_dni");
-                var request = index.get(calcMD5(document.querySelector("#dni1").value));//
-                //index.get(calcMD5(document.querySelector("#dni1").value));
-                //aquí le pasaría el dni recogido en la otra página y le añadiría
-                var request = objectDb1.put({ 
-                md: document.querySelector("#md").value,
-                slv: slv1,
-                mes: document.querySelector("#mes").value,
-                anyo: document.querySelector("#anyo").value,
-			    orde: parseFloat(( parseFloat(document.querySelector("#mes").value))+(12* parseFloat((document.querySelector("#anyo").value)-2000))), dni:calcMD5(document.querySelector("#dni1").value)//calcMD5(document.querySelector("#dni1").value)
-                });
-                request.onerror = function (e) {
+                var data1 = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
+                var objectDb2 = data1.objectStore("pruebas");
+                var index = objectDb2.index("by_dni");
+                var request = index.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
+                
+                request.onsuccess = function () {
+                
+				var result1 = request.result;
+			    if (confirm("Would you like delete this test?") == true) 
+                {
+				objectDb2.delete(result1.id);
+				alert('The medical test has been deleted correctly');
+				}
+			    else
+			    alert('Deletion canceled by user');
+					
+				  };
+				request.onerror = function (e) {
                     alert(request.error.name + '\n\n' + request.error.message);
                 };
 
-                data.oncomplete = function (e) { 
-
-                    document.querySelector('#md').value = '';
-                    document.querySelector('#slv').value = '';
-                    document.querySelector('#mes').value = '';
-                    document.querySelector('#anyo').value = '';
-                    alert('The medical test has been created correctly');
-                    //passdata(document.querySelector("#dni1").value);    
+                data1.oncomplete = function (e){
+					 if (confirm("Would you like continue deleting test?") == true) 
+                      	{
+				//objectDb2.delete(result1.id);
+			    	passdata(document.querySelector("#dni1").value,'deleteprueba');
+						}
+			    		else
+			    			passdata(document.querySelector("#dni1").value,'menu')
+                    //alert('The medical test has been deleted correctly');
+                   // passdata(document.querySelector("#dni1").value);    
                   };
-                };
-            }
+			  }
+			  
+			  
     
-          function deletedni() {
+           /* function deletedni() {
 
             var active = dataBase.result;
             var data = active.transaction(["pacientes"],"readwrite");
@@ -172,7 +131,7 @@
 
             // primero buscamos el registro a partir del dni
             var index = object.index("by_dni");
-            var request = index.get(document.querySelector("#dni1").value);
+            var request = calcMD5(index.get(document.querySelector("#dni1").value));
 
             // cuando se encuentre el registro, lo borramos
             request.onsuccess = function () {
@@ -185,12 +144,11 @@
                     alert(request.error.name + '\n\n' + request.error.message);
                 };
 
-                data.oncomplete = function (e) { 
-                    
-                    alert('OK');
-                    loadAll();
-                };
-        }
+                data.oncomplete = function (e){
+                    alert('The medical test has been deleted correctly');
+                    passdata(document.querySelector("#dni1").value);    
+                  };
+        }*/
     
 	          function load(id) {
                 var active = dataBase.result;
@@ -211,7 +169,7 @@
                 };
             }
         
-        function loadbydniref(dni)
+           function loadbydniref(dni)
               {
                 
                 loadByDni(dni.value);
@@ -236,6 +194,90 @@
                     }
                 };
             }
+             
+		    function loadpruebas(dni) { //mostrar pruebas por nºhistoria
+                var active = dataBase.result;
+                var data = active.transaction(["pruebas"], "readonly");
+                var objectDb = data.objectStore("pruebas");
+                var anyo=[];
+                var elements = [];
+                var meses = [];
+                var meses1 = [];
+                var md = [];
+                var slv = [];
+			    var ord=[];
+				var id=[];
+              
+                objectDb.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
+
+                    var result = e.target.result;
+
+                    if (result == null) {
+                       return;
+                    }
+				
+                   if(result.value.dni == calcMD5(dni))
+				   {
+				   id.push(parseFloat(result.value.id));
+                   meses1.push(parseFloat(result.value.mes));
+                   anyo.push(parseFloat(result.value.anyo));
+				   ord.push(parseFloat(result.value.orde));
+                   meses.push((parseFloat(result.value.anyo) + parseFloat(result.value.mes-1)/12).toFixed(4)); 
+                   //meses.sort();//ordenación
+                   md.push(parseFloat(result.value.md));
+                   slv.push(parseFloat(result.value.slv));//1 decimal
+                   
+				   var mini; 
+				   var tmp=ord[0];
+				   for (var x in ord){
+					   if(tmp>=ord[x]){
+						   tmp=ord[x];
+						   mini=x;
+					   }
+				   }
+				     
+				   var max;
+				        tmp=ord[0];
+				   for (var x in ord){
+					   if(tmp<ord[x]){
+						   tmp=ord[x];
+						   max=x;
+					   }
+					   
+					}
+				  
+					
+				   }
+					//console.log(pdm)
+                    result.continue();
+                     
+                };
+
+                
+              data.oncomplete = function() {
+                  
+                  var outerHTML = '';//creamos una variable para mostrar el código html
+                  //doble(meses,md);
+				    //if(md.length>=1)
+                    for (var key in meses1) {//recorremos el array elements 
+                        outerHTML += '\n\
+                        <tr>\n\
+						    <td>' + id[key] + '</td>\n\
+                            <td>' + meses1[key] + '</td>\n\
+							<td>' + anyo[key] + '</td>\n\
+                            <td>' + md[key] + '</td>\n\
+                            <td>' + slv[key].toFixed(3) + '</td>\n\
+                            <td>\n\
+                        </tr>';
+					}
+				    
+				 
+                    meses = [];//vaciamos elements
+                    md = [];
+                    document.querySelector("#elementsList").innerHTML = outerHTML;
+                };
+            }
+    
 
             function loadAll() {
                 var active = dataBase.result;
@@ -331,12 +373,13 @@
        for(i=0;i<tempArray1.length-1;i++){ // get value at array index i (name=value) 
        tempArray2=tempArray1[i].split("=") // split the string at character = 
        document.f1.elements["dni1"].value=tempArray2[1] // assign the value 
-              } 
+       loadpruebas(tempArray2[1]);      
+	         } 
             } 
          }
         
         function passdata(dni){
-			alert(dni.value);
+            
             myForm=document.f1 
             //myString="";
             //for(i=0;i<myForm.length-1;i++){ // run through form elements 
@@ -348,8 +391,9 @@
                     return n+"="+v+"&"
                 } 
             }
-        }
-	function passdata(dni,d){
+		}
+			
+	   function passdata(dni,d){
             
             myForm=document.f1 
             //myString="";
@@ -382,13 +426,15 @@
 			// PASSDATA(VALOR DEL DNI DE LA TRANSACCION, DESTINO)
 			}
         }
+		
+
          
 
     </script>
 </head>
 
 
-<body onload="startDB(); getData();">
+<body onload="startDB();">
 
     <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
     <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work below -->
@@ -410,26 +456,46 @@
     <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
     <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work above -->
     <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
-  <h1>Add test</h1>
+  <h1>Delete test</h1>
     
     <div class="align-center">
         <form name="f1"> 
         Nº History <input type="text" id="dni1" placeholder="dni" readonly/><br>
         </form>
-        Enter MD 
-        <input class="formu" type="text" id="md" placeholder="MD" pattern="[0-9]{0,}" required/><br>
-        Enter slv
-        <input type="text" id="slv" placeholder="sLv" required pattern="[A-Za-z]{3}"/><br>
-		<p>Enter Month</p> 
-        <input type="text" id="mes" placeholder="Month" required pattern="[0-9]{0,}"/><br>
-        Enter Year 
-        <input type="text" id="anyo" placeholder="Year" required pattern="[0-9]{0,}"/><br>
+        Enter Id Test 
+        <input class="formu" type="text" id="id" placeholder="Id" pattern="[0-9]{0,}" required/><br>
+		
+	    <div class="align-center">
+        <hr>
+        <div id="elements">
+            <table>
+                <caption>Tests</caption>
+                <thead>
+                    <tr>
+						<th>Id</th>
+                        <th>Month</th>
+                        <th>Year</th>
+                        <th>MD</th>
+                        <th>sLv</th>
+                    </tr>
+                </thead>
+				<caption>Resultados</caption>
+                <tbody id="elementsList">
+                    <tr>
+                        <td colspan="3">Not elements to show</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    <h1></h1>
+     <div id="container" class="margin_b"></div>
+    </div>
           
           <button onClick="volver_menu(dni1,'menu')">Main Menu</button>
-		  <button type="button" onclick="addprueba(dni1);">Save</button><hr>
+		  <button type="button" onclick="deleteprueba(id);">Delete</button><hr>
           <button onClick="self.location='index.html'">Home page</button> 
         
     </div>
 </body>
 </html>
-          
+       

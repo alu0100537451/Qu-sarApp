@@ -179,11 +179,11 @@ function grafica(md,slv) {
 
             }
     
-        function passdata(){ 
+        function passdata(d){ 
             myForm=document.f1 
             //for(i=0;i<myForm.length-1;i++){ // run through form elements 
             myString=add_delimiters("dni1",document.querySelector("#dni1").value) 
-            location.href = 'addprueba.html' + '?' + encodeURI(myString) 
+            location.href = d + '?' + encodeURI(myString) 
 
             function add_delimiters(n,v){ 
                 if(n!=""){ // add = and & characters to identify name and value pairs 
@@ -191,15 +191,16 @@ function grafica(md,slv) {
                 } 
             }
         }
-         
+	
+	
          function getData(){ 
            if (location.search.length > 0){ 
            dataPassed = decodeURI(location.search.substring(1)) 
            tempArray1=dataPassed.split("&") // split the string at character & and create an array of values  
-       for(i=0;i<tempArray1.length-1;i++){ // get value at array index i (name=value) 
-       tempArray2=tempArray1[i].split("=") // split the string at character = 
-       document.f1.elements["dni1"].value=tempArray2[1] // assign the value 
-       loadpruebas(tempArray2[1]);       
+           for(i=0;i<tempArray1.length-1;i++){ // get value at array index i (name=value) 
+             tempArray2=tempArray1[i].split("=") // split the string at character = 
+             document.f1.elements["dni1"].value=tempArray2[1] // assign the value 
+             loadpruebas(tempArray2[1]);       
               } 
             } 
          }
@@ -325,7 +326,7 @@ function grafica(md,slv) {
 					   
 				   var max;
 				        tmp=ord[0];
-				   for (var y in ord){
+				   for (var x in ord){
 					   if(tmp<ord[x]){
 						   tmp=ord[x];
 						   max=x;
@@ -348,28 +349,28 @@ function grafica(md,slv) {
 				   //meses.sort(meses1,anyo);
 				   //md.sort();
                    var mdp = md[mini];//defecto medio
-				   console.log('mdp:'+mdp);
+				   //console.log('mdp:'+mdp);
                    var mdu = md[max];
-				   console.log('mdu:'+mdu);
+				   //console.log('mdu:'+mdu);
                    var msp= meses1[mini];
-				   console.log('mes primero '+msp);
+				   //console.log('mes primero '+msp);
                    var msu= meses1[max];  
-				   console.log('mes ultimo'+msu);
+				   //console.log('mes ultimo'+msu);
 				   var ap= anyo[mini];
-				   console.log('año primero'+ap);
+				   //console.log('año primero'+ap);
                    var au= anyo[max];
-				   console.log('año ultimo: '+au);
+				   //console.log('año ultimo: '+au);
                    var t = (au+(msu/12))-(ap+(msp/12));
-				   console.log('tiempo:'+t);
+				   //console.log('tiempo:'+t);
                    //console.log('u '+mdu);
                    pdm = (mdu-mdp)/t;
-				   console.log('dB/y: '+pdm)
+				   //console.log('dB/y: '+pdm)
                    //mostrar pdm,numero de pruebas*/
                  //meses.push(result.value.anyo + (result.value.mes/12));
 				    if(pmd<=0.05 || plv<=0.05)
                     //console.log('Significant');
 					sig='Significant';
-					alert('aproximado');
+					//alert('aproximado');
 				 	if(pmd>0.05 & plv>0.05)
                     console.log('No Significant');
 					sig='No Significant';
@@ -398,8 +399,10 @@ function grafica(md,slv) {
 				     if(md.length>4)
 				      outerHTML+='\n\
 				     <tr>\n\
-				     <td>dB/y: ' + pdm + ' Resultado: ' + sig + '</td>\n\
-					  </tr>';
+				     <td>dB/y: ' + pdm.toFixed(3) + '</td>\n\
+                     <td>Resultado: ' + sig + '</td>\n\
+					 <td>\n\
+                     </tr>';
 				  
 				    if(md.length >4)
                     grafica(stringmd,stringslv);
@@ -409,6 +412,7 @@ function grafica(md,slv) {
                 };
             }
     
+
         function FishF(f,n1,n2) {
                 
                 var x=n2/(n1*f+n2)
@@ -658,7 +662,6 @@ function grafica(md,slv) {
                         <th>sLv</th>
                     </tr>
                 </thead>
-				<caption>Resultados</caption>
                 <tbody id="elementsList">
                     <tr>
                         <td colspan="3">Not elements to show</td>
@@ -669,8 +672,9 @@ function grafica(md,slv) {
     <h1></h1>
      <div id="container" class="margin_b"></div>
     </div>
-        <button onClick="passdata();">Add test</button><br>    
-        <button onclick="self.location='buscarpacient.html'">Search patient</button><br>
+        <button onClick="passdata('addprueba.html');">Add test</button><br>
+		<button onClick="passdata('deleteprueba.html');">Delete test</button><br> 
+        <button onclick="self.location='buscarpacient.html'">Search and Delete patient</button><br>
         <button onclick="self.location='index.html'">Home page</button>
 </div>
 <!--    <button onclick="showInterstitial()">Show Interstitial Ad</button>-->
