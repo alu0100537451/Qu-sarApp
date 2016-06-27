@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<!--
+  * Please see the included README.md file for license terms and conditions.
+  -->
+<head>
+    <title>QuasarApp</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+    <!-- see http://webdesign.tutsplus.com/tutorials/htmlcss-tutorials/quick-tip-dont-forget-the-viewport-meta-tag -->
+    <!-- <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1"> -->
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=no">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, minimum-scale=1, maximum-scale=2"> -->
+    <style>
+        /* following two viewport lines are equivalent to meta viewport statement above, and is needed for Windows */
+        /* see http://www.quirksmode.org/blog/archives/2014/05/html5_dev_conf.html and http://dev.w3.org/csswg/css-device-adapt/ */
+        @-ms-viewport { width: 100vw ; min-zoom: 100% ; zoom: 100% ; }          @viewport { width: 100vw ; min-zoom: 100% zoom: 100% ; }
+        @-ms-viewport { user-zoom: fixed ; min-zoom: 100% ; }                   @viewport { user-zoom: fixed ; min-zoom: 100% ; }
+        /*@-ms-viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }   @viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }*/
+    </style>
+
+    <!-- See explanation at the bottom of this file for info regarding placement of JS libraries. -->
+    <!-- These library references (below) are just examples to give you the general idea... -->
+    <!-- <script src="lib/mc/hammer.js"></script> -->
+    <!-- <script src="lib/ft/fastclick.js"></script> -->
+    <!-- <script src="lib/jq/jquery.js"></script> -->
+
+    <link rel="stylesheet" href="css/app.css">
+    <script language="JavaScript" src="js/md55.js"></script>    
+    <script type="text/javascript">
+    
+    
+            var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+            var dataBase = null;
+
+            function startDB() {
+
+                dataBase = indexedDB.open("objectDb12", 1);
+
+                dataBase.onupgradeneeded = function (e) {
+
+                    var active = dataBase.result;
+                    var objectDb = active.createObjectStore("pacientes", {keyPath: 'id', autoIncrement: true});
+                    objectDb.createIndex('by_dni', 'dni', {unique: true});
+                    
+                    var objectDb1 = active.createObjectStore("pruebas", {
+                    keyPath: 'id',
+                    autoIncrement: true
+                   }); 
+                    objectDb1.createIndex('by_dni', 'dni', {unique: false});
+                };
+
+                dataBase.onsuccess = function (e) {
+                    //alert('Database loaded');
+                    //loadAll();
+                    getData();
+                };
+
+                dataBase.onerror = function (e) {
+                    alert('Error loading database');
+                };
+
+            }
+
+            function deleteprueba() {
+             
+                var active = dataBase.result; //conector con la base de datos
+                var data1 = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
+                var objectDb2 = data1.objectStore("pruebas");
+                var index = objectDb2.index("by_dni");
+                var request = index.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
+                
+                request.onsuccess = function () {
+                
+                var result1 = request.result;
+                if (confirm("Would you like delete this test?") == true){       	if(result1.dni ==calcMD5(document.querySelector("#dni1").value) && result1.id== document.querySelector("id"))//no deja borrar id de otro paciente 
+			    /*
+				if (confirm("Would you like delete this test?") == true && (result.value.dni == calcMD5(document.querySelector("#dni1").value)))
+				*/
+                {
+				objectDb2.delete(result1.id);
+                alert('The medical test has been deleted correctly');
+                }
+                else
+                alert('Deletion canceled by user');   
+                  };
+				}
+				result1.continue();
+				request.onerror = function (e) {
+                    alert(request.error.name + '\n\n' + request.error.message);
+                };
+
+                data1.oncomplete = function (e){
+                     if (confirm("Would you like continue deleting test?") == true) 
+                        {
+                //objectDb2.delete(result1.id);
+                    passdata(document.querySelector("#dni1").value,'deleteprueba');
+                        }
+                        else
+                            passdata(document.querySelector("#dni1").value,'menu')
+                    //alert('The medical test has been deleted correctly');
+                   // passdata(document.querySelector("#dni1").value);    
+                  };
+              x}
+              
+    
+              function load(id) {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");
+                var object = data.objectStore("pacientes");
+
+                var request = object.get(parseInt(id));
+
+                request.onsuccess = function () {
+                    var result = request.result;
+
+                    if (result !== undefined) {
+                        alert("ID: " + result.id + "\n\
+                               DNI " + result.dni + "\n\
+                               Name: " + result.name + "\n\
+                               Surname: " + result.surname);
+                    }
+                };
+            }
+        
+           function loadbydniref(dni)
+              {
+                
+                loadByDni(dni.value);
+                
+            }
+
+            function loadByDni(dni) {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");
+                var object = data.objectStore("pacientes");
+                var index = object.index("by_dni");
+                var request = index.get(String(dni));
+
+                request.onsuccess = function () {
+                    var result = request.result;
+
+                    if (result !== undefined) {
+                        alert("ID: " + result.id + "\n\
+                               DNI " + result.dni + "\n\
+                               Name: " + result.name + "\n\
+                               Surname: " + result.surname);
+                    }
+                };
+            }
+             
+            function loadpruebas(dni) { //mostrar pruebas por nºhistoria
+                var active = dataBase.result;
+                var data = active.transaction(["pruebas"], "readonly");
+                var objectDb = data.objectStore("pruebas");
+                var anyo=[];
+                var elements = [];
+                var meses = [];
+                var meses1 = [];
+                var md = [];
+                var slv = [];
+                var ord=[];
+                var id=[];
+              
+                objectDb.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
+
+                    var result = e.target.result;
+
+                    if (result == null) {
+                       return;
+                    }
+                
+                   if(result.value.dni == calcMD5(dni))
+                   {
+                   id.push(parseFloat(result.value.id));
+                   meses1.push(parseFloat(result.value.mes));
+                   anyo.push(parseFloat(result.value.anyo));
+                   ord.push(parseFloat(result.value.orde));
+                   meses.push((parseFloat(result.value.anyo) + parseFloat(result.value.mes-1)/12).toFixed(4)); 
+                   //meses.sort();//ordenación
+                   md.push(parseFloat(result.value.md));
+                   slv.push(parseFloat(result.value.slv));//1 decimal
+                   
+                   var mini; 
+                   var tmp=ord[0];
+                   for (var x in ord){
+                       if(tmp>=ord[x]){
+                           tmp=ord[x];
+                           mini=x;
+                       }
+                   }
+                     
+                   var max;
+                        tmp=ord[0];
+                   for (var x in ord){
+                       if(tmp<ord[x]){
+                           tmp=ord[x];
+                           max=x;
+                       }
+                       
+                    }
+                  
+                    
+                   }
+                    //console.log(pdm)
+                    result.continue();
+                     
+                };
+
+                
+              data.oncomplete = function() {
+                  
+                  var outerHTML = '';//creamos una variable para mostrar el código html
+                  //doble(meses,md);
+                    //if(md.length>=1)
+                    for (var key in meses1) {//recorremos el array elements 
+                        outerHTML += '\n\
+                        <tr>\n\
+                            <td>' + id[key] + '</td>\n\
+                            <td>' + meses1[key] + '</td>\n\
+                            <td>' + anyo[key] + '</td>\n\
+                            <td>' + md[key] + '</td>\n\
+                            <td>' + slv[key].toFixed(3) + '</td>\n\
+                            <td>\n\
+                        </tr>';
+                    }
+                    
+                 
+                    meses = [];//vaciamos elements
+                    md = [];
+                    document.querySelector("#elementsList").innerHTML = outerHTML;
+                };
+            }
+    
+       
+        function getData(){ 
+           if (location.search.length > 0){ 
+           dataPassed = decodeURI(location.search.substring(1)) 
+           tempArray1=dataPassed.split("&") // split the string at character & and create an array of values  
+       for(i=0;i<tempArray1.length-1;i++){ // get value at array index i (name=value) 
+       tempArray2=tempArray1[i].split("=") // split the string at character = 
+       document.f1.elements["dni1"].value=tempArray2[1] // assign the value 
+       loadpruebas(tempArray2[1]);      
+             } 
+            } 
+         }
+        
+        function passdata(dni){
+            
+            myForm=document.f1 
+            //myString="";
+            //for(i=0;i<myForm.length-1;i++){ // run through form elements 
+            myString=add_delimiters("dni1",dni) 
+            location.href = 'menu.html' + '?' + encodeURI(myString) 
+
+            function add_delimiters(n,v){ 
+                if(n!=""){ // add = and & characters to identify name and value pairs 
+                    return n+"="+v+"&"
+                } 
+            }
+        }
+            
+       function passdata(dni,d){
+            
+            myForm=document.f1 
+            //myString="";
+            //for(i=0;i<myForm.length-1;i++){ // run through form elements 
+            myString=add_delimiters("dni1",dni) 
+            location.href = d + '.html' + '?' + encodeURI(myString) 
+
+            function add_delimiters(n,v){ 
+                if(n!=""){ // add = and & characters to identify name and value pairs 
+                    return n+"="+v+"&"
+                } 
+            }
+       }
+           
+
+            
+            function volver_menu (dni,destino){
+            //ABRIR TRANSACCION CON DNI
+                    
+                var active = dataBase.result; //conector con la base de datos
+                var data1 = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
+                var objectDb2 = data1.objectStore("pruebas");
+                var index = objectDb2.index("by_dni");
+                var request = index.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
+                
+                request.onsuccess = function () {
+                
+                var result1 = request.result;
+                passdata(document.querySelector("#dni1").value,destino);
+            // PASSDATA(VALOR DEL DNI DE LA TRANSACCION, DESTINO)
+            }
+        }
+
+    </script>
+</head>
+
+<body onload="startDB();">
+
+    <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
+    <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work below -->
+    <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
+
+    <!-- See <head> section above for additional JS libraries loaded as part of this application. -->
+
+    <script src="cordova.js"></script>          <!-- "Phantom" cordova.js required for projects that use plugins -->
+
+    <script src="js/app.js"></script>           <!-- for your event code, see README and file comments for details -->
+    <script src="js/init-app.js"></script>      <!-- for your init code, see README and file comments for details -->
+    <script src="xdk/init-dev.js"></script>     <!-- normalizes device and document ready events, see file for details -->
+    <script src="js/util.js"></script>    
+
+    <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
+    <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work above -->
+    <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
+   <!--  <button id="id_btnExtPage" onclick="extPage()">Open in InAppBrowser</button>
+    <button id="id_btnExtPageTimed" onclick=extPageTimed();>Open in InAppBrowser for 3 secs</button>
+    <button id="id_btnExtPageSysBrowser" onclick=extPageSysBrowser();>Open in System Web Browser</button>
+    <button id="id_btnLocalImg" onclick=localImg();>Open Local Image</button>--> 
+    <h1>Delete test</h1>
+    
+    <div class="align-center">
+        <form name="f1"> 
+        Nº History <input type="text" id="dni1" placeholder="dni" readonly/><br>
+        </form>
+        Enter Id Test 
+        <input class="formu" type="text" id="id" placeholder="Id" pattern="[0-9]{0,}" required/><br>
+        
+        <div class="align-center">
+        <hr>
+        <div id="elements">
+            <table>
+                <caption>Tests</caption>
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Month</th>
+                        <th>Year</th>
+                        <th>MD</th>
+                        <th>sLv</th>
+                    </tr>
+                </thead>
+                <caption>Resultados</caption>
+                <tbody id="elementsList">
+                    <tr>
+                        <td colspan="3">Not elements to show</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    <h1></h1>
+     <div id="container" class="margin_b"></div>
+    </div>
+          
+          <button onClick="volver_menu(dni1,'menu')">Main Menu</button>
+          <button type="button" onclick="deleteprueba(id);">Delete</button><hr>
+          <button onClick="self.location='index.html'">Home page</button> 
+        
+    </div>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+<!--
+  * Please see the included README.md file for license terms and conditions.
+  -->
+<head>
+    <title>QuasarApp</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+    <!-- see http://webdesign.tutsplus.com/tutorials/htmlcss-tutorials/quick-tip-dont-forget-the-viewport-meta-tag -->
+    <!-- <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1"> -->
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=no">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, minimum-scale=1, maximum-scale=2"> -->
+    <style>
+        /* following two viewport lines are equivalent to meta viewport statement above, and is needed for Windows */
+        /* see http://www.quirksmode.org/blog/archives/2014/05/html5_dev_conf.html and http://dev.w3.org/csswg/css-device-adapt/ */
+        @-ms-viewport { width: 100vw ; min-zoom: 100% ; zoom: 100% ; }          @viewport { width: 100vw ; min-zoom: 100% zoom: 100% ; }
+        @-ms-viewport { user-zoom: fixed ; min-zoom: 100% ; }                   @viewport { user-zoom: fixed ; min-zoom: 100% ; }
+        /*@-ms-viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }   @viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }*/
+    </style>
+
+    <!-- See explanation at the bottom of this file for info regarding placement of JS libraries. -->
+    <!-- These library references (below) are just examples to give you the general idea... -->
+    <!-- <script src="lib/mc/hammer.js"></script> -->
+    <!-- <script src="lib/ft/fastclick.js"></script> -->
+    <!-- <script src="lib/jq/jquery.js"></script> -->
+
+<link rel="stylesheet" href="css/app.css">
+<script src="js/jquery-2.1.3.min.js"></script>
+<script src="js/highstock.js"></script>
+<script src="js/exporting.js"></script>
+<script src="js/highcharts-regression.js"> </script>
+<script src="js/md55.js"> </script>
+<script>
+    
+function grafica(md,slv) {
+       
+      var myString = md;
+      var myString2 = slv;
+    
+        $('#container').highcharts({
+            chart: {
+                type: 'scatter',
+                zoomType: 'xy'
+            },
+            title: {
+                text: 'Análisis de regresión lineal Glaucoma'
+            },
+            xAxis: {
+                title: {
+                    enabled: true,
+                    text: 'Years'
+                },
+                startOnTick: true,
+                endOnTick: true,
+                showLastLabel: true
+            },
+            yAxis: {
+                title: {
+                    text: 'MD(Mean Defect)/sLv'
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'left',
+                verticalAlign: 'top',
+                x: 100,
+                y: 70,
+                floating: true,
+                backgroundColor: '#FFFFFF',
+                borderWidth: 1
+            },
+            plotOptions: {
+                scatter: {
+                    marker: {
+                        radius: 5,
+                        states: {
+                            hover: {
+                                enabled: true,
+                                lineColor: 'rgb(100,100,100)'
+                            }
+                        }
+                    },
+                    states: {
+                        hover: {
+                            marker: {
+                                enabled: false
+                            }
+                        }
+                    },
+                    tooltip: {
+                        headerFormat: '<b>{series.name}</b><br>',
+                        pointFormat: '{point.x} y, {point.y} dB'
+                    }
+                }
+            },
+            series: [{
+                regression: true ,
+                regressionSettings: {
+                    type: 'linear',
+                    color:  'red'
+                },
+                name: 'Points slv',
+                color: 'rgba(223, 83, 83, .5)',
+                data: myString
+    
+            }, 
+            {
+                regression: true ,
+                regressionSettings: {
+                    type: 'linear',
+                    color:  'blue'
+                },
+                name: 'Points MD',
+                color: 'rgba(223, 83, 83, .5)',
+                data: myString2
+            
+                    
+            }]
+        });
+    }
+    
+</script>
+
+<script type="text/javascript">
+    
+            var Pi=Math.PI; var PiD2=Pi/2; var PiD4=Pi/4; var Pi2=2*Pi
+            var e=2.718281828459045235; var e10 = 1.105170918075647625
+            var Deg=180/Pi//hsta aquí
+            var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+            var dataBase = null;
+
+          function startDB() {
+ 
+                dataBase = indexedDB.open("objectDb12", 1);
+
+                dataBase.onupgradeneeded = function (e) {
+
+                    var active = dataBase.result;
+                    var objectDb = active.createObjectStore("pacientes", {keyPath: 'id', autoIncrement: true});
+                    objectDb.createIndex('by_dni', 'dni', {unique: true});
+
+                    var objectDb1 = active.createObjectStore("pruebas", {
+                    keyPath: 'id',
+                    autoIncrement: true
+                   });              
+                }
+
+                dataBase.onsuccess = function (e) {
+                    //alert('Database loaded');
+                    //loadAll();
+                    getData();
+                };
+
+                dataBase.onerror = function (e) {
+                    alert('Error loading database');
+                };
+
+            }
+    
+                function passdata(d){ 
+            myForm=document.f1 
+            //for(i=0;i<myForm.length-1;i++){ // run through form elements 
+            myString=add_delimiters("dni1",document.querySelector("#dni1").value) 
+            location.href = d + '?' + encodeURI(myString) 
+
+            function add_delimiters(n,v){ 
+                if(n!=""){ // add = and & characters to identify name and value pairs 
+                    return n+"="+v+"&"
+                } 
+            }
+        }
+  
+  
+         function getData(){ 
+           if (location.search.length > 0){ 
+           dataPassed = decodeURI(location.search.substring(1)) 
+           tempArray1=dataPassed.split("&") // split the string at character & and create an array of values  
+           for(i=0;i<tempArray1.length-1;i++){ // get value at array index i (name=value) 
+             tempArray2=tempArray1[i].split("=") // split the string at character = 
+             document.f1.elements["dni1"].value=tempArray2[1] // assign the value 
+             loadpruebas(tempArray2[1]);       
+              } 
+            } 
+         }
+      
+         function doble(meses,valor){
+           var vectmp=new Array();
+           var it_tmp=0;
+    
+          while(it_tmp < meses.length){
+           vectmp.push([parseFloat(meses[it_tmp]),valor[it_tmp]]);
+      //vectmp.push(['hola','mundo']);
+      //console.log(vectmp[it_tmp]);
+           it_tmp++;}
+           return vectmp;
+         }
+    
+         function load(id) {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");
+                var objectDb = data.objectStore("pacientes");
+
+                var request = objectDb.get(parseInt(id));
+
+                request.onsuccess = function () {
+                    var result = request.result;
+
+                    if (result !== undefined) {
+                        alert("ID: " + result.id + "\n\
+                               DNI " + result.dni + "\n\
+                               Tipo: " + result.tipo);
+                    }
+                };
+            }
+        
+        function loadbydniref(dni)
+              {
+                
+                loadByDni(dni.value);
+                
+            }
+
+            function loadByDni(dni) { //mostrar pruebas por nºhistoria
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");
+                var objectDb = data.objectStore("pacientes");
+                var index = objectDb.index("by_dni");
+                var request = index.get(String(dni));
+
+                request.onsuccess = function () {
+                    var result = request.result;
+
+                    if (result !== undefined) {
+                        alert("ID: " + result.id + "\n\
+                               DNI " + result.dni + "\n\
+                               Tipo: " + result.tipo);
+                    }
+                };
+            }
+    
+           function loaddni(dni)
+              {
+                  alert("dni:" + dni.value);
+                
+                loadpruebas(dni.value);
+                
+            }
+    
+          function loadpruebas(dni) { //mostrar pruebas por nºhistoria
+                var active = dataBase.result;
+                var data = active.transaction(["pruebas"], "readonly");
+                var objectDb = data.objectStore("pruebas");
+                var anyo=[];
+                var elements = [];
+                var meses = [];
+                var meses1 = [];
+                var md = [];
+                var slv = [];
+                var pmd;
+                var plv;
+                var stringmd=[];
+                var stringslv=[];
+                var pdm;
+                var mesespdm=[];
+                var sig;
+                var ord=[];
+              
+                objectDb.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
+
+                    var result = e.target.result;
+
+                    if (result == null) {
+                       return;
+                    }
+        
+                   if(result.value.dni == calcMD5(dni)){
+                   meses1.push(parseFloat(result.value.mes));
+                   anyo.push(parseFloat(result.value.anyo));
+                   ord.push(parseFloat(result.value.orde));
+                   meses.push((parseFloat(result.value.anyo) + parseFloat(result.value.mes-1)/12).toFixed(4)); 
+                   //meses.sort();//ordenación
+                   md.push(parseFloat(result.value.md));
+                   slv.push(parseFloat(result.value.slv));//1 decimal
+                   //resultados = linearRegression(md,meses);
+                   pmd = linearRegression(md,meses);
+                   plv = linearRegression(slv,meses);
+                   stringmd=doble(meses,md);
+                   stringslv=doble(meses,slv);
+                   console.log("p-value md:" + pmd);
+                   console.log("p-value plv:" + plv);
+                   
+                   var mini; 
+                   var tmp=ord[0];
+                   for (var x in ord){
+                     if(tmp>=ord[x]){
+                     tmp=ord[x];
+                     mini=x;
+                     }
+                   }
+             
+                   var max;
+                   tmp=ord[0];
+                   for (var x in ord){
+                     if(tmp<ord[x]){
+                     tmp=ord[x];
+                     max=x;}
+                   }
+				   
+				   function deMenorAMayor(elem1, elem2) {return elem1-elem2;}
+                   var mdp = md[mini];//defecto medio
+                   console.log('mdp:'+mdp);
+                   var mdu = md[max];
+                   console.log('mdu:'+mdu);
+                   var msp = meses1[mini];
+                   console.log('mes primero '+msp);
+                   var msu = meses1[max];  
+                   console.log('mes ultimo'+msu);
+                   var ap = anyo[mini];
+                   console.log('año primero'+ap);
+                   var au = anyo[max];
+                   console.log('año ultimo: '+au);
+                   var t = (au+(msu/12))-(ap+(msp/12));
+                   console.log('tiempo:'+t);
+                   //console.log('u '+mdu);
+                   pdm = (mdu-mdp)/t;
+                   console.log('dB/y: '+pdm)
+                   //mostrar pdm,numero de pruebas*/
+                 //meses.push(result.value.anyo + (result.value.mes/12));
+                   if(pmd<=0.05 || plv<=0.05)
+                    //console.log('Significant');
+                    sig='Significant';
+          //alert('aproximado');
+                   if(pmd>0.05 & plv>0.05)
+                    //console.log('No Significant');
+                    sig='No Significant';
+                 }
+          //console.log(pdm)
+                    result.continue();
+                     
+              };
+			  
+			 
+                
+              data.oncomplete = function() {
+                   var tmp1=[];
+				   //tmp1=ord.sort();
+				   //alert(tmp1);
+                  var outerHTML = '';//creamos una variable para mostrar el código html
+                  //doble(meses,md);
+            //if(md.length>=1)
+				  //var j=0;
+				     for(var i in ord){
+						 tmp1[i]=parseInt(ord[i]);}
+			             tmp1.sort();
+						 console.log(tmp1);
+				      
+                    for (var key in meses,meses1) {//recorremos el array elements
+						
+						//if(tmp1[i]==ord[key]){
+						//	alert(ord[key]);
+						
+					  //if(tmp)
+                        outerHTML += '\n\
+                        <tr>\n\
+                            <td>' + meses1[key] + '</td>\n\
+                            <td>' + anyo[key] + '</td>\n\
+                            <td>' + md[key] + '</td>\n\
+                            <td>' + slv[key].toFixed(3) + '</td>\n\
+                            <td>\n\
+                        </tr>';
+						}
+					 
+          
+                    if(md.length>4)
+                     outerHTML+='\n\
+                     <tr>\n\
+                     <td>dB/y : ' + pdm.toFixed(3) + '</td><tr>\n\
+                     <td>Resultado : ' + sig + '</td><tr>\n\
+					 <td>p-value MD : ' + pmd  + '</td><tr>\n\
+                     <td>p-value sLV : ' + plv  + '</td><tr>\n\
+                     <td>\n\
+                     </tr>';
+                    /*humphrey
+                     outerHTML+='\n\
+                     <tr>\n\
+                     <td>dB/y : ' + pdm.toFixed(3) + '</td>\n\
+                     <td>Resultado : ' + sig + '</td>\n\
+					 <td>p-value MD : ' + pdm  + '</td>\n\
+                     <td>p-value PSD : ' + plv  + '</td>\n\
+                     <td>\n\
+                     </tr>';*/
+				    if(md.length>4)
+                    grafica(stringmd,stringslv);
+                    meses = [];//vaciamos elements
+                    md = [];
+                    document.querySelector("#elementsList").innerHTML = outerHTML;
+		        };
+            }
+    
+
+        function FishF(f,n1,n2) {
+                
+                var x=n2/(n1*f+n2)
+                if((n1%2)==0){ 
+                return StatCom(1-x,n2,n1+n2-4,n2-2)*Math.pow(x,n2/2) 
+                }
+                if((n2%2)==0){ return 1-StatCom(x,n1,n1+n2-4,n1-2)*Math.pow(1-x,n1/2) }
+                var th=Math.atan(Math.sqrt(n1*f/n2)); var a=th/PiD2; var sth=Math.sin(th); var cth=Math.cos(th)
+                if(n2>1) { a=a+sth*cth*StatCom(cth*cth,2,n2-3,-1)/PiD2 }
+                if(n1==1) { return 1-a }
+                var c=4*StatCom(sth*sth,n2+1,n1+n2-4,n2-2)*sth*Math.pow(cth,n2)/Pi
+                if(n2==1) { return 1-a+c/2 }
+                var k=2; while(k<=(n2-1)/2) {c=c*k/(k-.5); k=k+1 }
+                return 1-a+c}
+    
+        function Fmt(x) { 
+                var v
+                if(x>=0) { v=''+(x+0.00005) } else { v=''+(x-0.00005) }
+                return v.substring(0,v.indexOf('.')+5)
+                        }
+        function StatCom(q,i,j,b) {
+               var zz=1; 
+               var z=zz; 
+               var k=i; 
+               while(k<=j){ 
+                zz=zz*q*k/(k-b); 
+                z=z+zz; 
+                k=k+2 
+               }
+              return z
+        }
+
+    
+        function linearRegression(y,x){
+
+        var lr = {};
+        var n = y.length;
+        var nx  = x.length;
+        var sum_x = 0;
+        var sum_y = 0;
+        var sum_xy = 0;
+        var sum_xx = 0;
+        var sum_yy = 0;
+        var meanx = 0;
+        var meany = 0;
+        var vx=0;
+        var vy=0;
+
+        
+        for (var i = 0; i < y.length; i++) {
+
+            sum_x += parseFloat(x[i]);
+           // vx=vx+Math.pow(x[i]-meanx,2);
+            sum_y += parseFloat(y[i]);
+            sum_xy += (parseFloat(x[i])*parseFloat(y[i]));
+            sum_xx += (parseFloat(x[i])*parseFloat(x[i]));
+            sum_yy += (parseFloat(y[i])*parseFloat(y[i]));
+        } 
+            
+        meanx = parseFloat(sum_x)/parseFloat(nx);
+        meany = parseFloat(sum_y)/parseFloat(n);
+            
+        for (var i = 0; i < y.length; i++) {
+
+            vx=vx+Math.pow(parseFloat(x[i])-parseFloat(meanx),2);
+            vy=vy+Math.pow(parseFloat(y[i])-parseFloat(meany),2);
+        }
+         
+            var vx1 = vx/(nx-1);
+            var VX2 = Math.round(10000000*vx1)/10000000;
+            var vy1 = vy/(n-1);
+            var VY2 = Math.round(10000000*vy1)/10000000;
+            //console.log('Vx: '+VX2);
+            //console.log('Vy: '+VY2);
+            //console.log(meany);
+            
+            lr['slope'] = (n * sum_xy - sum_x * sum_y) / (n*sum_xx - sum_x * sum_x);
+            //f stadistic
+            var SSEF = parseFloat(VY2-(lr['slope']*lr['slope'])*VX2);
+            //console.log('SSEF: '+ SSEF);
+            var SSRF = (parseFloat(Math.pow(lr['slope'],2)))*parseFloat(VX2);
+           // console.log('SSRF: '+SSRF);
+            var MSEF = SSEF/(nx-2);
+            //console.log('SSEF: '+SSEF);
+            var FVAL1 = SSRF/MSEF;
+            
+            
+            var Fp = FVAL1 + "";   //forcing to be a string
+            if (Fp.indexOf("Infinity") != -1) {
+            console.log('Too large'); 
+            }
+            else {  
+            var FVAL2 = Math.round(10000000*FVAL1);
+            var FVAL = FVAL2/10000000;
+            //form.FVAL.value = FVAL;
+            //console.log('FVAL: '+ FVAL);   
+                
+            df1 = 1;
+            df2 = nx-2;
+        
+            var pf2 = Fmt(FishF(FVAL1,df1,df2));
+            if (Fp.indexOf("Infinity") != -1) {
+                        console.log(0); }
+            else {
+                        
+            var pp = pf2 + "";   //forcing to be a string
+                        if (pp.indexOf("e") != -1) {
+                                 console.log("Almost Zero"); }
+                        else {  
+                                //console.log('P value md:'+pf2);
+                                }
+                        }       
+                       
+        //console.log('Mean x: '+meanx);
+        //console.log('Varianza x:'+ vx);
+        lr['intercept'] = (sum_y - lr.slope * sum_x)/n;//intercepción
+        lr['r2'] = Math.pow((n*sum_xy - sum_x*sum_y)/Math.sqrt((n*sum_xx-sum_x*sum_x)*(n*sum_yy-sum_y*sum_y)),2).toFixed(2);//coeficiente de determinación
+            
+        return pf2;
+
+       // resultados.push(lr[r2]);
+
+          };
+    
+    
+      }
+	
+	function validateControl(e) {
+  if(!e.checkValidity()) {
+    if(e.classList.contains('valid')) {
+      e.classList.remove('valid');
+    }
+    e.classList.add('invalid');
+  } else {
+    if(e.classList.contains('invalid')) {
+      e.classList.remove('invalid');
+    }
+    e.classList.add('valid');
+  }
+}
+    </script>
+</head>
+
+<body onload="startDB();">
+    <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
+    <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work below -->
+    <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
+
+    <!-- See <head> section above for additional JS libraries loaded as part of this application. -->
+
+    <script src="cordova.js"></script>          <!-- "Phantom" cordova.js required for projects that use plugins -->
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/app.js"></script>           <!-- for your event code, see README and file comments for details -->
+    <script src="js/init-app.js"></script>      <!-- for your init code, see README and file comments for details -->
+    <script src="xdk/init-dev.js"></script>     <!-- normalizes device and document ready events, see file for details -->
+    <script src="js/util.js"></script>    
+
+    <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
+    <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work above -->
+    <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
+   <!--  <button id="id_btnExtPage" onclick="extPage()">Open in InAppBrowser</button>
+    <button id="id_btnExtPageTimed" onclick=extPageTimed();>Open in InAppBrowser for 3 secs</button>
+    <button id="id_btnExtPageSysBrowser" onclick=extPageSysBrowser();>Open in System Web Browser</button>
+    <button id="id_btnLocalImg" onclick=localImg();>Open Local Image</button>--> 
+    
+    <div class="align-center">
+		<h1>Main menu</h1>
+		<section id="three" class="wrapper style1 fade-up">
+						<div class="inner">
+							<div class="split style1">
+								
+									<form name="f1">
+										<div class="field">
+									      <label for="name">NºHistoria</label>
+	           								<input type="text" id="dni1" placeholder="dni" readonly/>
+										</div>
+									</form>
+							</div>
+						</div>
+		</section>
+									
+        <hr>
+        <div id="elements">
+            <table>
+                <caption>Tests</caption>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Year</th>
+                        <th>MD</th>
+                        <th>sLv</th>
+                    </tr>
+                </thead>
+                <tbody id="elementsList">
+                    <tr>
+                        <td colspan="3">Not elements to show</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    <h1></h1>
+     <div id="container" class="margin_b"></div>
+	
+    <button onClick="passdata('addprueba.html');">Add test</button><br>
+    <button onClick="passdata('deleteprueba.html');">Delete test</button><br> 
+        <button onclick="self.location='buscarpacient.html'">Search and Delete patient</button><br>
+        <button onclick="self.location='index.html'">Home page</button>
+	</div>
+</body>
+</html>
