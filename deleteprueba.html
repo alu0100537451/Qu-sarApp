@@ -26,9 +26,14 @@
     <!-- <script src="lib/jq/jquery.js"></script> -->
 
     <link rel="stylesheet" href="css/app.css">
+	<link rel="stylesheet" href="css/main.css">
     <script language="JavaScript" src="js/md55.js"></script>    
     <script type="text/javascript">
-    
+    		function quitarfoco( id )
+			{
+				elemento = document.getElementById(id);
+				elemento.blur();
+			}
     
             var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
             var dataBase = null;
@@ -67,28 +72,46 @@
                 var active = dataBase.result; //conector con la base de datos
                 var data1 = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
                 var objectDb2 = data1.objectStore("pruebas");
-                var index = objectDb2.index("by_dni");
-                var request = index.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
+               // var index = objectDb2.index("by_dni");
+                //var request = index.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
                 
-                request.onsuccess = function () {
                 
-                var result1 = request.result;
-                if (confirm("Would you like delete this test?") == true){       	if(result1.dni ==calcMD5(document.querySelector("#dni1").value) && result1.id== document.querySelector("id"))//no deja borrar id de otro paciente 
-			    /*
-				if (confirm("Would you like delete this test?") == true && (result.value.dni == calcMD5(document.querySelector("#dni1").value)))
-				*/
-                {
-				objectDb2.delete(result1.id);
-                alert('The medical test has been deleted correctly');
-                }
-                else
-                alert('Deletion canceled by user');   
-                  };
+                 objectDb2.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
+
+                   var result1 = e.target.result;
+
+                        if (result1 == null) {
+                           return;
+                        }
+                
+					
+					if(result1.value.dni == calcMD5(document.querySelector("#dni1").value) && result1.value.id == document.querySelector("#id").value){
+				    	if (confirm("Would you like delete this test?") == true){
+					//no deja borrar id de otro paciente 
+
+						objectDb2.delete(result1.value.id);
+						alert('The medical test has been deleted correctly');
+						}
+					else
+						alert('Deletion canceled by user'); 
+								
 				}
-				result1.continue();
-				request.onerror = function (e) {
+					
+				else{
+					/*if(result1.value.dni != calcMD5(document.querySelector("#dni1").value)){
+					   alert("No borres lo que no debes borrar")
+					   result1.break();
+					}*/
+					result1.continue();	
+				 }
+                  
+		
+				//result1.continue();
+		        };
+		
+				/*request.onerror = function (e) {
                     alert(request.error.name + '\n\n' + request.error.message);
-                };
+                };*/
 
                 data1.oncomplete = function (e){
                      if (confirm("Would you like continue deleting test?") == true) 
@@ -101,8 +124,9 @@
                     //alert('The medical test has been deleted correctly');
                    // passdata(document.querySelector("#dni1").value);    
                   };
-              x}
-              
+				
+				quitarfoco("deletebutton");
+              }
     
               function load(id) {
                 var active = dataBase.result;
@@ -319,17 +343,29 @@
     <button id="id_btnExtPageTimed" onclick=extPageTimed();>Open in InAppBrowser for 3 secs</button>
     <button id="id_btnExtPageSysBrowser" onclick=extPageSysBrowser();>Open in System Web Browser</button>
     <button id="id_btnLocalImg" onclick=localImg();>Open Local Image</button>--> 
-    <h1>Delete test</h1>
+    
     
     <div class="align-center">
-        <form name="f1"> 
-        Nº History <input type="text" id="dni1" placeholder="dni" readonly/><br>
-        </form>
-        Enter Id Test 
-        <input class="formu" type="text" id="id" placeholder="Id" pattern="[0-9]{0,}" required/><br>
-        
-        <div class="align-center">
-        <hr>
+		<h1>Delete test</h1>
+		<section id="three" class="wrapper style1 fade-up">
+						<div class="inner">
+							<div class="split style1">
+									<form name="f1">
+										<div class="field">
+									      <label for="name">NºHistory</label>
+	           								<input type="text" id="dni1" placeholder="dni" readonly/>
+										</div>
+										<div class="field">
+									      <label for="name">Id Test</label>
+	           							  <input type="text" id="id" placeholder="Enter Id" required/>
+										</div>
+									</form>
+							</div>
+						</div>
+		</section>
+		<!--<button type="button" onclick="deleteprueba(id);">Delete</button>-->
+        <a class="button submit" onclick="deleteprueba(id);">Delete test</a><br>
+		<hr>
         <div id="elements">
             <table>
                 <caption>Tests</caption>
@@ -342,7 +378,6 @@
                         <th>sLv</th>
                     </tr>
                 </thead>
-                <caption>Resultados</caption>
                 <tbody id="elementsList">
                     <tr>
                         <td colspan="3">Not elements to show</td>
@@ -351,13 +386,70 @@
             </table>
         </div>
     <h1></h1>
-     <div id="container" class="margin_b"></div>
-    </div>
+    <div id="container" class="margin_b"></div>
           
           <button onClick="volver_menu(dni1,'menu')">Main Menu</button>
-          <button type="button" onclick="deleteprueba(id);">Delete</button><hr>
           <button onClick="self.location='index.html'">Home page</button> 
         
     </div>
 </body>
 </html>
+
+<!--
+<div class="align-center">
+		<h1>Main menu</h1>
+		<section id="three" class="wrapper style1 fade-up">
+						<div class="inner">
+							<div class="split style1">
+								
+									<form name="f1">
+										<div class="field">
+									      <label for="name">NºHistory</label>
+	           								<input type="text" id="dni1" placeholder="dni" readonly/>
+										</div>
+									</form>
+							</div>
+						</div>
+		</section>
+									
+        <hr>
+        <div id="elements">
+            <table>
+                <caption class ="titles">Tests</caption>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Year</th>
+                        <th>MD</th>
+                        <th>sLv</th>
+                    </tr>
+                </thead>
+                <tbody id="elementsList">
+                    <tr>
+                        <td colspan="3">Not elements to show</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+		<div id="elementsfu">
+            <table>
+                <caption class ="titles">Resultados</caption>
+                <tbody id="elementsListfu">
+                    <tr>
+                        <td colspan="3">Not elements to show</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    <h1></h1>
+     <div id="container" class="margin_b"></div>
+	
+    <button onClick="passdata('addprueba.html');">Add test</button><br>
+    <button onClick="passdata('deleteprueba.html');">Delete test</button><br> 
+        <button onclick="self.location='buscarpacient.html'">Search and Delete patient</button><br>
+        <button onclick="self.location='index.html'">Home page</button>
+	</div>
+</body>
+</html>
+
+<input class="formu" type="text" id="id" placeholder="Id" pattern="[0-9]{0,}" required/><br>-->

@@ -290,7 +290,9 @@ function grafica(md,slv) {
                    console.log("p-value md:" + pmd);
                    console.log("p-value plv:" + plv);
                    
-                   var mini; 
+                  
+					   
+				   var mini; 
                    var tmp=ord[0];
                    for (var x in ord){
                      if(tmp>=ord[x]){
@@ -298,16 +300,18 @@ function grafica(md,slv) {
                      mini=x;
                      }
                    }
-             
-                   var max;
+				
+				   var max;
                    tmp=ord[0];
                    for (var x in ord){
-                     if(tmp<ord[x]){
+                     if(tmp<=ord[x]){
                      tmp=ord[x];
                      max=x;}
                    }
+             
+                   
 				   
-				   function deMenorAMayor(elem1, elem2) {return elem1-elem2;}
+				   //function deMenorAMayor(elem1, elem2) {return elem1-elem2;}
                    var mdp = md[mini];//defecto medio
                    console.log('mdp:'+mdp);
                    var mdu = md[max];
@@ -350,6 +354,7 @@ function grafica(md,slv) {
                   //doble(meses,md);
             //if(md.length>=1)
 				  //var j=0;
+				  var outerHTMLfu = '';
 				     for(var i in ord){
 						 tmp1[i]=parseInt(ord[i]);}
 			             tmp1.sort();
@@ -373,7 +378,7 @@ function grafica(md,slv) {
 					 
           
                     if(md.length>4)
-                     outerHTML+='\n\
+                     outerHTMLfu+='\n\
                      <tr>\n\
                      <td>dB/y : ' + pdm.toFixed(3) + '</td><tr>\n\
                      <td>Resultado : ' + sig + '</td><tr>\n\
@@ -381,20 +386,12 @@ function grafica(md,slv) {
                      <td>p-value sLV : ' + plv  + '</td><tr>\n\
                      <td>\n\
                      </tr>';
-                    /*humphrey
-                     outerHTML+='\n\
-                     <tr>\n\
-                     <td>dB/y : ' + pdm.toFixed(3) + '</td>\n\
-                     <td>Resultado : ' + sig + '</td>\n\
-					 <td>p-value MD : ' + pdm  + '</td>\n\
-                     <td>p-value PSD : ' + plv  + '</td>\n\
-                     <td>\n\
-                     </tr>';*/
 				    if(md.length>4)
                     grafica(stringmd,stringslv);
                     meses = [];//vaciamos elements
                     md = [];
                     document.querySelector("#elementsList").innerHTML = outerHTML;
+				    document.querySelector("#elementsListfu").innerHTML = outerHTMLfu;
 		        };
             }
     
@@ -572,7 +569,7 @@ function grafica(md,slv) {
 								
 									<form name="f1">
 										<div class="field">
-									      <label for="name">NºHistoria</label>
+									      <label for="name">NºHistory</label>
 	           								<input type="text" id="dni1" placeholder="dni" readonly/>
 										</div>
 									</form>
@@ -583,7 +580,7 @@ function grafica(md,slv) {
         <hr>
         <div id="elements">
             <table>
-                <caption>Tests</caption>
+                <caption class ="titles">Tests</caption>
                 <thead>
                     <tr>
                         <th>Month</th>
@@ -593,6 +590,16 @@ function grafica(md,slv) {
                     </tr>
                 </thead>
                 <tbody id="elementsList">
+                    <tr>
+                        <td colspan="3">Not elements to show</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+		<div id="elementsfu">
+            <table>
+                <caption class ="titles">Resultados</caption>
+                <tbody id="elementsListfu">
                     <tr>
                         <td colspan="3">Not elements to show</td>
                     </tr>

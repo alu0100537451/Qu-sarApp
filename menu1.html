@@ -350,6 +350,7 @@ function grafica(md,slv) {
                   //doble(meses,md);
             //if(md.length>=1)
 				  //var j=0;
+				  var outerHTMLfu = '';
 				     for(var i in ord){
 						 tmp1[i]=parseInt(ord[i]);}
 			             tmp1.sort();
@@ -373,7 +374,7 @@ function grafica(md,slv) {
 					 
           
                     if(md.length>4)
-                     outerHTML+='\n\
+                     outerHTMLfu+='\n\
                      <tr>\n\
                      <td>dB/y : ' + pdm.toFixed(3) + '</td><tr>\n\
                      <td>Resultado : ' + sig + '</td><tr>\n\
@@ -395,6 +396,7 @@ function grafica(md,slv) {
                     meses = [];//vaciamos elements
                     md = [];
                     document.querySelector("#elementsList").innerHTML = outerHTML;
+				    document.querySelector("#elementsListfu").innerHTML = outerHTMLfu;
 		        };
             }
     
@@ -571,7 +573,7 @@ function grafica(md,slv) {
 							<div class="split style1">
 									<form name="f1">
 										<div class="field">
-									      <label for="name">NºHistoria</label>
+									      <label for="name">NºHistory</label>
 	           								<input type="text" id="dni1" placeholder="dni" readonly/>
 										</div>
 									</form>
@@ -582,7 +584,7 @@ function grafica(md,slv) {
         <hr>
         <div id="elements">
             <table>
-                <caption>Tests</caption>
+                <caption class="titles">Tests</caption>
                 <thead>
                     <tr>
                         <th>Month</th>
@@ -592,6 +594,16 @@ function grafica(md,slv) {
                     </tr>
                 </thead>
                 <tbody id="elementsList">
+                    <tr>
+                        <td colspan="3">Not elements to show</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+		<div id="elementsfu">
+            <table>
+                <caption class="titles">Resultados</caption>
+                <tbody id="elementsListfu">
                     <tr>
                         <td colspan="3">Not elements to show</td>
                     </tr>
