@@ -3,6 +3,7 @@
 <!--
   * Please see the included README.md file for license terms and conditions.
   -->
+
 <head>
     <title>QuasarApp</title>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
@@ -14,8 +15,27 @@
     <style>
         /* following two viewport lines are equivalent to meta viewport statement above, and is needed for Windows */
         /* see http://www.quirksmode.org/blog/archives/2014/05/html5_dev_conf.html and http://dev.w3.org/csswg/css-device-adapt/ */
-        @-ms-viewport { width: 100vw ; min-zoom: 100% ; zoom: 100% ; }          @viewport { width: 100vw ; min-zoom: 100% zoom: 100% ; }
-        @-ms-viewport { user-zoom: fixed ; min-zoom: 100% ; }                   @viewport { user-zoom: fixed ; min-zoom: 100% ; }
+        
+        @-ms-viewport {
+            width: 100vw;
+            min-zoom: 100%;
+            zoom: 100%;
+        }
+        
+        @viewport {
+            width: 100vw;
+            min-zoom: 100% zoom: 100%;
+        }
+        
+        @-ms-viewport {
+            user-zoom: fixed;
+            min-zoom: 100%;
+        }
+        
+        @viewport {
+            user-zoom: fixed;
+            min-zoom: 100%;
+        }
         /*@-ms-viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }   @viewport { user-zoom: zoom ; min-zoom: 100% ; max-zoom: 200% ; }*/
     </style>
 
@@ -24,7 +44,7 @@
     <!-- <script src="lib/mc/hammer.js"></script> -->
     <!-- <script src="lib/ft/fastclick.js"></script> -->
     <!-- <script src="lib/jq/jquery.js"></script> -->
-    <link rel="stylesheet" href="css/main.css">
+
     <link rel="stylesheet" href="css/app.css">
     <script language="JavaScript" src="js/md55.js"></script>
     <script type="text/javascript">
@@ -35,7 +55,7 @@
 
             function startDB() {
 
-                dataBase = indexedDB.open("objectDb12", 1);
+                dataBase = indexedDB.open("objectDb7", 1);
 
                 dataBase.onupgradeneeded = function (e) {
 
@@ -75,10 +95,7 @@
                 request.onerror = function (e) {
                     alert(request.error.name + '\n\n' + request.error.message);
                 };
-                
-                request.onsuccess = function () {
-                    alert(request.error.name + '\n\n' + request.error.message);
-                };
+
                 data.oncomplete = function (e) {
 
                     document.querySelector('#dni').value = '';
@@ -89,13 +106,9 @@
 
             }
     
-        function addprueba() {
+       function addprueba() {
            //
                 //pruebas
-                if(!document.querySelector('form').checkValidity()) {
-                    alert('El formulario tiene errores');
-                }else{
-
                 var active2 = dataBase.result; //conector con la base de datos
                 var data1 = active2.transaction(["pacientes"], "readwrite"); //array ,modo de transacción
                 var objectDb = data1.objectStore("pacientes");
@@ -106,7 +119,7 @@
                 
                 md1 = parseFloat(document.querySelector("#md").value);
                 slv1 = parseFloat(document.querySelector("#slv").value);
-                var result = request1.result;
+                var result= request1.result;
                 tipo1 = result.tipo;
                 //alert('hola'+tipo1);
                 if( md1 >16.33 && tipo1 == "O" )//octopus
@@ -114,11 +127,11 @@
                     //alert('estoy aquí');
                   slv1 = slv1 + ((md1-16.33)/0.84);
                   //alert('hola'+slv1);
-                  //alert(slv1);
+				  //alert(slv1);
                  }else if( md1 <-17.35 && tipo1 =="H"){ //humfrey
-                  slv1 = slv1 - ((md1+17.35)/0.84)
-                  //alert(md1);
-                  //alert(slv1);
+                  slv1 = slv1 + ((md1+17.35)/0.84)
+				  //alert(md1);
+				  //alert(slv1);
                  }
                     
                 var active = dataBase.result; //conector con la base de datos
@@ -132,8 +145,7 @@
                 md: document.querySelector("#md").value,
                 slv: slv1,
                 mes: document.querySelector("#mes").value,
-                anyo: document.querySelector("#anyo").value,
-                orde: parseFloat(( parseFloat(document.querySelector("#mes").value))+(12* parseFloat((document.querySelector("#anyo").value)-2000))), dni:calcMD5(document.querySelector("#dni1").value)//calcMD5(document.querySelector("#dni1").value)
+                anyo: document.querySelector("#anyo").value, dni:calcMD5(document.querySelector("#dni1").value)//calcMD5(document.querySelector("#dni1").value)
                 });
                 request.onerror = function (e) {
                     alert(request.error.name + '\n\n' + request.error.message);
@@ -146,14 +158,40 @@
                     document.querySelector('#mes').value = '';
                     document.querySelector('#anyo').value = '';
                     alert('The medical test has been created correctly');
-                    //passdata(document.querySelector("#dni1").value);    
+                    passdata(document.querySelector("#dni1").value);    
                   };
                 };
             }
-        }
-            
     
-              function load(id) {
+    function deletedni() {
+
+            var active = dataBase.result;
+            var data = active.transaction(["pacientes"],"readwrite");
+            var object = data.objectStore("pacientes");    
+
+            // primero buscamos el registro a partir del dni
+            var index = object.index("by_dni");
+            var request = index.get(document.querySelector("#dni1").value);
+
+            // cuando se encuentre el registro, lo borramos
+            request.onsuccess = function () {
+            var result = request.result;
+            alert("ID: " + result.id );
+            object.delete(result.id);
+            };
+            
+                request.onerror = function (e) {
+                    alert(request.error.name + '\n\n' + request.error.message);
+                };
+
+                data.oncomplete = function (e) { 
+                    
+                    alert('OK');
+                    loadAll();
+                };
+        }
+    
+	          function load(id) {
                 var active = dataBase.result;
                 var data = active.transaction(["pacientes"], "readonly");
                 var object = data.objectStore("pacientes");
@@ -197,21 +235,107 @@
                     }
                 };
             }
-     
+
+            function loadAll() {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");
+                var object = data.objectStore("pacientes");//sobre que almacen queremos trabajar
+
+                var elements = [];//array donde guardamos los objetos del almacen
+
+                object.openCursor().onsuccess = function (e) { //cuando entra en el almacen 
+
+                    var result = e.target.result; //el resultado de abrir el curso esta en result
+
+                    if (result === null) {//es cuando llegamos al final
+                        return;
+                    }
+
+                    elements.push(result.value);//vamos guardando en el array
+                    result.continue();//para continuar con el siguiente objeto
+
+                };
+
+                data.oncomplete = function () { //cuando se haya completado todo 
+
+                    var outerHTML = '';//creamos una variable para mostrar el código html
+
+                    for (var key in elements) {//recorremos el array elements 
+
+                        outerHTML += '\n\
+                        <tr>\n\
+                            <td>' + elements[key].dni + '</td>\n\
+                            <td>' + elements[key].name + '</td>\n\
+                            <td>\n\
+                                <button type="button" onclick="load(' + elements[key].id + ')">Detalles</button>\n\
+                                <button type="button" onclick="loadByDni(\'' + elements[key].dni + '\')">Detalles dni</button>\n\
+                            </td>\n\
+                        </tr>';
+
+                    }
+
+                    elements = [];//vaciamos elements
+                    document.querySelector("#elementsList").innerHTML = outerHTML;
+                };
+            }
+            
+            function loadAllByName() {
+                var active = dataBase.result;
+                var data = active.transaction(["pacientes"], "readonly");//lanzar transacción
+                var object = data.objectStore("pacientes");//
+                var index = object.index("by_name");
+                
+                var elements = [];
+
+                index.openCursor().onsuccess = function (e) {
+
+                    var result = e.target.result;
+
+                    if (result === null) {
+                        return;
+                    }
+
+                    elements.push(result.value);
+                    result.continue();
+
+                };
+
+                data.oncomplete = function () {
+
+                    var outerHTML = '';
+
+                    for (var key in elements) {
+
+                        outerHTML += '\n\
+                        <tr>\n\
+                            <td>' + elements[key].dni + '</td>\n\
+                            <td>' + elements[key].name + '</td>\n\
+                            <td>\n\
+                                <button type="button" onclick="load(' + elements[key].id + ')">Details</button>\n\
+                                <button type="button" onclick="loadByDni(' + elements[key].dni + ')">Details DNI</button>\n\
+                            </td>\n\
+                        </tr>';
+
+                    }
+
+                    elements = [];
+                    document.querySelector("#elementsList").innerHTML = outerHTML;
+                };
+            }
        
-        function getData(){ 
+	    function getData(){ 
            if (location.search.length > 0){ 
            dataPassed = decodeURI(location.search.substring(1)) 
            tempArray1=dataPassed.split("&") // split the string at character & and create an array of values  
-           for(i=0;i<tempArray1.length-1;i++){ // get value at array index i (name=value) 
-        tempArray2=tempArray1[i].split("=") // split the string at character = 
-        document.f1.elements["dni1"].value=tempArray2[1] // assign the value 
+       for(i=0;i<tempArray1.length-1;i++){ // get value at array index i (name=value) 
+       tempArray2=tempArray1[i].split("=") // split the string at character = 
+       document.f1.elements["dni1"].value=tempArray2[1] // assign the value 
               } 
             } 
          }
         
         function passdata(dni){
-            alert(dni.value);
+            
             myForm=document.f1 
             //myString="";
             //for(i=0;i<myForm.length-1;i++){ // run through form elements 
@@ -224,57 +348,11 @@
                 } 
             }
         }
-    
-        function passdata(dni,d){
-            
-            myForm=document.f1 
-            //myString="";
-            //for(i=0;i<myForm.length-1;i++){ // run through form elements 
-            myString=add_delimiters("dni1",dni) 
-            location.href = d + '.html' + '?' + encodeURI(myString) 
+         
 
-            function add_delimiters(n,v){ 
-                if(n!=""){ // add = and & characters to identify name and value pairs 
-                    return n+"="+v+"&"
-                } 
-            }
-        }
-           
-
-            
-            function volver_menu (dni,destino){
-            //ABRIR TRANSACCION CON DNI
-                    
-                var active = dataBase.result; //conector con la base de datos
-                var data1 = active.transaction(["pruebas"], "readwrite"); //array ,modo de transacción
-                var objectDb2 = data1.objectStore("pruebas");
-                var index = objectDb2.index("by_dni");
-                var request = index.get(calcMD5(document.querySelector("#dni1").value));//index1.get(calcMD5(document.querySelector("#dni1").value));//md5(document.querySelector("#dni1").value);//
-                
-                request.onsuccess = function () {
-                
-                var result1 = request.result;
-                passdata(document.querySelector("#dni1").value,destino);
-            // PASSDATA(VALOR DEL DNI DE LA TRANSACCION, DESTINO)
-               }
-            }
-        
-        function validateControl(e) {
-          if(!e.checkValidity()) {
-            if(e.classList.contains('valid')) {
-                e.classList.remove('valid');
-            }
-            e.classList.add('invalid');
-          }else{
-            if(e.classList.contains('invalid')) {
-                e.classList.remove('invalid');
-            }
-            e.classList.add('valid');
-           }
-        }
-
-   </script>
+    </script>
 </head>
+
 
 <body onload="startDB(); getData();">
 
@@ -284,67 +362,40 @@
 
     <!-- See <head> section above for additional JS libraries loaded as part of this application. -->
 
-    <script src="cordova.js"></script>          <!-- "Phantom" cordova.js required for projects that use plugins -->
+    <script src="cordova.js"></script>
+    <!-- "Phantom" cordova.js required for projects that use plugins -->
 
-    <script src="js/app.js"></script>           <!-- for your event code, see README and file comments for details -->
-    <script src="js/init-app.js"></script>      <!-- for your init code, see README and file comments for details -->
-    <script src="xdk/init-dev.js"></script>     <!-- normalizes device and document ready events, see file for details -->
-    <script src="js/jquery.min.js"></script>
-    <script src="js/jquery.scrollex.min.js"></script>
-    <script src="js/jquery.scrolly.min.js"></script>
-    <script src="js/skel.min.js"></script>
+    <script src="js/app.js"></script>
+    <!-- for your event code, see README and file comments for details -->
+    <script src="js/init-app.js"></script>
+    <!-- for your init code, see README and file comments for details -->
+    <script src="xdk/init-dev.js"></script>
+    <!-- normalizes device and document ready events, see file for details -->
     <script src="js/util.js"></script>
 
     <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
     <!-- Place your remote debugging (weinre) script URL from the Test tab here, if it does not work above -->
     <!-- <script src="http://debug-software.intel.com/target/target-script-min.js#insertabiglongfunkynumberfromthexdkstesttab"></script> -->
-   <!--  <button id="id_btnExtPage" onclick="extPage()">Open in InAppBrowser</button>
-    <button id="id_btnExtPageTimed" onclick=extPageTimed();>Open in InAppBrowser for 3 secs</button>
-    <button id="id_btnExtPageSysBrowser" onclick=extPageSysBrowser();>Open in System Web Browser</button>
-    <button id="id_btnLocalImg" onclick=localImg();>Open Local Image</button>--> 
+  <h1>Add test</h1>
     
-<!--
-               <li><br><a href class="button submit" onclick="addprueba(dni1);">Save</a><hr></li>
-        -->
-   <div align="center">
-   <section id="three" class="wrapper style1 fade-up">
-                        <div class="inner">
-                            <h2>Add test</h2>
-                            <p>En esta pantalla se permite crear una prueba para el paciente seleccionado.</p>
-                            <div class="split style1">
-                                <section>
-                                    <form name="f1">
-                                        <div class="field">
-                                            <label for="name">NºHistoria</label>
-                                            <input type="text" id="dni1" placeholder="dni" readonly/>
-                                        </div>
-                                        <div class="field half">
-                                            <label for="email">Enter MD</label>
-                                            <input type="text" id="md" placeholder="MD" onkeyup="validateControl(this)" pattern="[-+]?[0-9]*[.,]?[0-9]+" required/>
-                                        </div>
-                                        <div class="field half">
-                                            <label for="slv">Enter sLv</label>
-                                            <input type="text" id="slv" placeholder="sLv" onkeyup="validateControl(this)" pattern="[-+]?[0-9]*[.,]?[0-9]+" required/>
-                                        </div>
-                                        <div class="field half">
-                                            <label for="slv">Enter Month</label>
-                                            <input type="text" id="mes" placeholder="Month" onkeyup="validateControl(this)" pattern="[-+]?[0-9]*?[0-9]+" required/>
-                                        </div>
-                                        <div class="field half">
-                                            <label for="Year">Enter Year</label>
-                                            <input type="text" id="anyo" placeholder="Year" onkeyup="validateControl(this)" pattern="[-+]?[0-9]*?[0-9]+" required/>
-                                        </div>
-                                        </form>
-                                        <ul class="actions">
-                                            <a class="button submit" onclick="addprueba(dni1);">Save</a><br><br>
-                                            <a class="button submit" onclick="volver_menu(dni1,'menu')">Progression Menu</a><br>
-                                            <br><a class="button submit" onClick="self.location='index.html'">Home</a>
-                                        </ul>
-                                    
-                                    </section>
-                                    </div>
-                                </div>
-        </section>
-       </div>
-  </body>
+    <div class="align-center">
+        <form name="f1"> 
+        Nº History <input type="text" id="dni1" placeholder="dni" readonly/><br>
+        </form>
+        Enter MD 
+        <input class="formu" type="text" id="md" placeholder="MD"/><br>
+        Enter sLv 
+        <input type="text" id="slv" placeholder="sLv"/><br>
+		<p>Enter Month</p> 
+        <input type="text" id="mes" placeholder="Month"/><br>
+        Enter Year 
+        <input type="text" id="anyo" placeholder="Year"/><br>
+          
+          <button onClick="self.location='menu.html'">Main Menu</button>
+		  <button type="button" onclick="addprueba(dni1);">Save</button><hr>
+          <button onClick="self.location='index.html'">Home page</button> 
+        
+    </div>
+</body>
 </html>
+          

@@ -26,8 +26,8 @@
     <!-- <script src="lib/jq/jquery.js"></script> -->
 
     <link rel="stylesheet" href="css/app.css">
-	<link rel="stylesheet" href="css/main.css">
-	<script language="JavaScript" src="js/md55.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+    <script language="JavaScript" src="js/md55.js"></script>
     <script type="text/javascript">
     
     
@@ -76,8 +76,8 @@
                 request.onerror = function (e) {
                     alert(request.error.name + '\n\n' + request.error.message);
                 };
-				
-				request.onsuccess = function () {
+                
+                request.onsuccess = function () {
                     alert('The patient has been created successfully');
                 };
                 data.oncomplete = function (e) {
@@ -104,9 +104,9 @@
     <script src="js/init-app.js"></script>      <!-- for your init code, see README and file comments for details -->
     <script src="xdk/init-dev.js"></script>     <!-- normalizes device and document ready events, see file for details -->
     <script src="js/jquery.min.js"></script>
-	<script src="js/jquery.scrollex.min.js"></script>
-	<script src="js/jquery.scrolly.min.js"></script>
-	<script src="js/skel.min.js"></script>
+    <script src="js/jquery.scrollex.min.js"></script>
+    <script src="js/jquery.scrolly.min.js"></script>
+    <script src="js/skel.min.js"></script>
     <script src="js/util.js"></script>
 
     <!-- IMPORTANT: Do not include a weinre script tag as part of your release builds! -->
@@ -133,26 +133,26 @@
 
 
 <div align="center">
-	<section id="three" class="wrapper style1 fade-up">
-						<div class="inner">
-							<h2>Create patient</h2>
-							<p>En esta pantalla se puede realizar la creación de los pacientes.</p>
-							<div class="split style1">
-								<section>
-										<div class="field half">
-                							<input type="text" id="dni" placeholder="Enter NºHistory" required/><br>
-										</div>
-									<h3>Choose type</h3><hr>
-									<form>
-									<a class="button submit" id="tipoO" name="gender" onclick="addpacient('O');">Octopus</a><br><br>
-									<a class="button submit" id="tipoH" name="gender" onclick="addpacient('H');">Humphrey</a><br>
-									</form>
-									<a class="button submit" onClick="self.location='index.html'">Home</a>	
-									</section>
-									</div>
-								</div>
+    <section id="three" class="wrapper style1 fade-up">
+                        <div class="inner">
+                            <h2>Create patient</h2>
+                            <p>En esta pantalla se puede realizar la creación de los pacientes.</p>
+                            <div class="split style1">
+                                <section>
+                                        <div class="field half">
+                                            <input type="text" id="dni" placeholder="Enter NºHistory" required/><br>
+                                        </div>
+                                    <h3>Choose type</h3><hr>
+                                    <form>
+                                    <a class="button submit" id="tipoO" name="gender" onclick="addpacient('O');">Octopus</a><br><br>
+                                    <a class="button submit" id="tipoH" name="gender" onclick="addpacient('H');">Humphrey</a><br>
+                                    </form>
+                                    <a class="button submit" onClick="self.location='index.html'">Home</a>  
+                                    </section>
+                                    </div>
+                                </div>
           
         </section>
-	</div>
-	</body>
+    </div>
+    </body>
 </html>
