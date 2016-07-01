@@ -98,13 +98,15 @@
 				}
 					
 				else{
+					
 					/*if(result1.value.dni != calcMD5(document.querySelector("#dni1").value)){
 					   alert("No borres lo que no debes borrar")
 					   result1.break();
 					}*/
 					result1.continue();	
 				 }
-                  
+					 
+                  alert("No borres lo que no debes borrar");
 		
 				//result1.continue();
 		        };
@@ -298,8 +300,6 @@
                 } 
             }
        }
-           
-
             
             function volver_menu (dni,destino){
             //ABRIR TRANSACCION CON DNI
@@ -368,7 +368,7 @@
 		<hr>
         <div id="elements">
             <table>
-                <caption>Tests</caption>
+                <caption class="titles">Tests</caption>
                 <thead>
                     <tr>
                         <th>Id</th>
@@ -385,71 +385,12 @@
                 </tbody>
             </table>
         </div>
-    <h1></h1>
     <div id="container" class="margin_b"></div>
-          
+          <a class="button submit" onclick="volver_menu(dni1,'menu')">Main Menu</a><br><br>
+		  <a class="button submit" onclick="self.location='index.html'">Home Page</a><br><br>
+		  <!--
           <button onClick="volver_menu(dni1,'menu')">Main Menu</button>
-          <button onClick="self.location='index.html'">Home page</button> 
-        
-    </div>
+          <button onClick="self.location='index.html'">Home page</button> -->     
+ </div>
 </body>
 </html>
-
-<!--
-<div class="align-center">
-		<h1>Main menu</h1>
-		<section id="three" class="wrapper style1 fade-up">
-						<div class="inner">
-							<div class="split style1">
-								
-									<form name="f1">
-										<div class="field">
-									      <label for="name">NºHistory</label>
-	           								<input type="text" id="dni1" placeholder="dni" readonly/>
-										</div>
-									</form>
-							</div>
-						</div>
-		</section>
-									
-        <hr>
-        <div id="elements">
-            <table>
-                <caption class ="titles">Tests</caption>
-                <thead>
-                    <tr>
-                        <th>Month</th>
-                        <th>Year</th>
-                        <th>MD</th>
-                        <th>sLv</th>
-                    </tr>
-                </thead>
-                <tbody id="elementsList">
-                    <tr>
-                        <td colspan="3">Not elements to show</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-		<div id="elementsfu">
-            <table>
-                <caption class ="titles">Resultados</caption>
-                <tbody id="elementsListfu">
-                    <tr>
-                        <td colspan="3">Not elements to show</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    <h1></h1>
-     <div id="container" class="margin_b"></div>
-	
-    <button onClick="passdata('addprueba.html');">Add test</button><br>
-    <button onClick="passdata('deleteprueba.html');">Delete test</button><br> 
-        <button onclick="self.location='buscarpacient.html'">Search and Delete patient</button><br>
-        <button onclick="self.location='index.html'">Home page</button>
-	</div>
-</body>
-</html>
-
-<input class="formu" type="text" id="id" placeholder="Id" pattern="[0-9]{0,}" required/><br>-->

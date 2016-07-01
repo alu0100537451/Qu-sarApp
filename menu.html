@@ -100,7 +100,7 @@ function grafica(md,slv) {
                     type: 'linear',
                     color:  'red'
                 },
-                name: 'Points slv',
+                name: 'Points MD',
                 color: 'rgba(223, 83, 83, .5)',
                 data: myString
     
@@ -111,7 +111,7 @@ function grafica(md,slv) {
                     type: 'linear',
                     color:  'blue'
                 },
-                name: 'Points MD',
+                name: 'Points sLV',
                 color: 'rgba(223, 83, 83, .5)',
                 data: myString2
             
@@ -561,7 +561,7 @@ function grafica(md,slv) {
     <button id="id_btnExtPageSysBrowser" onclick=extPageSysBrowser();>Open in System Web Browser</button>
     <button id="id_btnLocalImg" onclick=localImg();>Open Local Image</button>--> 
     
-    <div class="align-center">
+  <div class="align-center">
 		<h1>Main menu</h1>
 		<section id="three" class="wrapper style1 fade-up">
 						<div class="inner">
@@ -606,13 +606,15 @@ function grafica(md,slv) {
                 </tbody>
             </table>
         </div>
-    <h1></h1>
      <div id="container" class="margin_b"></div>
-	
-    <button onClick="passdata('addprueba.html');">Add test</button><br>
-    <button onClick="passdata('deleteprueba.html');">Delete test</button><br> 
-        <button onclick="self.location='buscarpacient.html'">Search and Delete patient</button><br>
-        <button onclick="self.location='index.html'">Home page</button>
-	</div>
+	   <a class="button submit" onclick="passdata('addprueba.html');">Add test</a><br><br>
+	   <a class="button submit" onclick="passdata('deleteprueba.html');">Delete test</a><br><br>
+	   <a class="button submit" onclick="self.location='buscarpacient.html'">Search and Delete patient</a><br><br>
+	   <a class="button submit" onclick="self.location='index.html'">Home page</a><br><br>
+       <!--<button onClick="passdata('addprueba.html');">Add test</button><br>
+       <button onClick="passdata('deleteprueba.html');">Delete test</button><br> 
+       <button onclick="self.location='buscarpacient.html'">Search and Delete patient</button><br>
+       <button onclick="self.location='index.html'">Home page</button>-->
+ </div>
 </body>
 </html>

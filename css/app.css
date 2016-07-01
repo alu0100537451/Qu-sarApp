@@ -151,7 +151,6 @@ button:focus {
 	padding-left: 41% !important;
 }
 
-
 .valid {
   border-color: #27ae60 !important;
   box-shadow: 0 0 3px rgba(39,174,96,.4) !important;
@@ -161,6 +160,15 @@ button:focus {
   box-shadow: 0 0 3px rgba(231,76,60,.4) !important;
 }
 
+*{ font-family: sans-serif; margin: 0;}
+		dl{ margin: 60px auto; width: 600px; }
+		dt, dd{ padding: 20px; }
+		dt{ background: #333333; color: white; border-bottom: 1px solid #141414; border-top: 1px solid #4E4E4E; cursor: pointer; }
+		dd{ background: #F5F5F5; display: none; line-height: 1.6em; }
+		dt.activo, dt:hover{ background: #424242; }
+
+		dt:before{ content: "▸"; margin-right: 10px; }
+		dt.activo:before{ content: "▾"; }
 
 
 
